@@ -1,0 +1,4 @@
+[all]
+localhost ansible_connection=local ansible_user=ubuntu ansible_become=true
+10.1.0.11 ansible_connection=ssh ansible_user=ubuntu ansible_become=true
+10.1.0.12 ansible_connection=ssh ansible_user=ubuntu ansible_become=true
