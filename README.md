@@ -119,3 +119,7 @@ ansible -i $HOME/inventory all -a "uname -an"
 If everything went fine until this point, it means you are now ready to
 move to **OpenStack** part of the workshop. Please open the instructions by
 clicking [this link](https://github.com/fdegir/infra-workshop/tree/master/openstack).
+
+# References
+[1] https://docs.docker.com/install/linux/docker-ce/ubuntu/
+[2] https://docs.openstack.org/kolla-ansible/queens/user/quickstart.html
