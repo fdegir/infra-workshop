@@ -86,9 +86,9 @@ using Ansible against those nodes later on.
 ```bash
 cat <<EOF > $HOME/inventory
 [all]
-jumphost   ansible_connection=local ansible_user=ubuntu ansible_become=true
-controller ansible_connection=ssh ansible_user=ubuntu ansible_become=true
-compute    ansible_connection=ssh ansible_user=ubuntu ansible_become=true
+localhost ansible_connection=local ansible_user=ubuntu ansible_become=true
+10.1.0.11 ansible_connection=ssh ansible_user=ubuntu ansible_become=true
+10.1.0.12 ansible_connection=ssh ansible_user=ubuntu ansible_become=true
 EOF
 cat $HOME/inventory
 ansible -i $HOME/inventory all -m raw -a "apt-get install -y python-dev"
