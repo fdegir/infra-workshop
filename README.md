@@ -69,27 +69,14 @@ We first install the packages required by Ansible.
 ```bash
 sudo apt-get install -y python-pip python-dev libffi-dev gcc \
     libssl-dev python-selinux
-pip install -U pip==9.0.3
+sudo pip install -U pip==9.0.3
 ```
 
 We can now install Ansible.
 
 ```bash
-pip install --user ansible==2.5.8
+sudo pip install ansible==2.5.8
 ```
-
-Since we installed Ansible into user install directory, we need to update
-**PATH** environment variable and include that location. Whenever you logout
-the machine or the environment variables are reset for some reason, you need
-to ensure setting this variable again.
-
-```bash
-export PATH=$HOME/.local/bin:$PATH
-which ansible
-```
-
-We now have Ansible installed on Jumphost. Let's verify our installation works
-as expected.
 
 Please use below commands which create the file named **inventory** with the
 details of target nodes we will be using in ubuntu user's home directory. We
