@@ -2,12 +2,12 @@
 
 1. [Introduction](#introduction)
 2. [OpenStack Installation](#openstack-install-basic-usage)
-   2.1. [Install and Configure Kolla-Ansible](#install-configure-kolla-ansible)
-   2.2. [Install OpenStack](#install-openstack)
-   2.3. [Prepare for Initial Use](#prepare-initial-use)
+    2.1. [Install and Configure Kolla-Ansible](#install-configure-kolla-ansible)
+    2.2. [Install OpenStack](#install-openstack)
+    2.3. [Prepare for Initial Use](#prepare-initial-use)
 3. [Basic OpenStack Usage](#use-openstack)
-   3.1. [Use OpenStack with OpenStack Client](#use-openstack-with-osc)
-   3.2. [Use OpenStack with Horizon](#use-openstack-with-horizon)
+    3.1. [Use OpenStack with OpenStack Client](#use-openstack-with-osc)
+    3.2. [Use OpenStack with Horizon](#use-openstack-with-horizon)
 4. [Next Steps](#next-steps)
 5. [References](#references)
 
