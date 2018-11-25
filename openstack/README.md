@@ -278,6 +278,16 @@ the instances, images, keypairs, networks, routers and so on.
 
 # Next Steps <a name="next-steps"></a>
 
+Before moving to the next part of the workshop, we need to cleanup the environment
+in order to ensure the existing OpenStack installation doesn't impact
+Kubernetes work.
+
+Please execute the command below on **jumphost**.
+
+```bash
+kolla-ansible destroy --include-images --yes-i-really-really-mean-it
+```
+
 You completed the OpenStack part of the workshop. You can now move to Kubernetes
 part by clicking [this link](https://github.com/fdegir/infra-workshop/tree/master/kubernetes).
 
