@@ -1,4 +1,20 @@
-# OpenStack Installation and Basic Usage
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [OpenStack Installation](#openstack-install-basic-usage)
+   2.1. [Install and Configure Kolla-Ansible](#install-configure-kolla-ansible)
+   2.2. [Install OpenStack](#install-openstack)
+   2.3. [Prepare for Initial Use](#prepare-initial-use)
+3. [Basic OpenStack Usage](#use-openstack)
+   3.1. [Use OpenStack with OpenStack Client](#use-openstack-with-osc)
+   3.2. [Use OpenStack with Horizon](#use-openstack-with-horizon)
+4. [Next Steps](#next-steps)
+5. [References](#references)
+
+
+# Introduction <a name="introduction"></a>
+
+# OpenStack Installation and Basic Usage <a name="openstack-install-basic-usage"></a>
 
 This guide contains information about installing **OpenStack Rocky** using
 Kolla-Ansible. Almost everything in this guide is taken from official
@@ -7,7 +23,7 @@ Kolla-Ansible documentation and adapted for the purposes of this workshop. [1]
 All the commands listed on this guide must be executed on Jumphost unless
 otherwise is noted.
 
-## Install Kolla-Ansible and Prepare the Initial Configuration
+## Install and Configure Kolla-Ansible <a name="install-configure-kolla-ansible"></a>
 
 In this section, we will install Kolla-Ansible using pip and make the necessary
 configuration.
@@ -45,7 +61,7 @@ sudo kolla-genpwd
 cat /etc/kolla/passwords.yml
 ```
 
-## Install OpenStack
+## Install OpenStack <a name="install-openstack"></a>
 
 We are now ready to start installing OpenStack using Kolla-Ansible.
 
@@ -80,7 +96,7 @@ If you encounter issues while running the deployment, please rerun the above
 command as the issues are probably temporary and the installation will probably
 succeed.
 
-## Prepare for Initial Use
+## Prepare for Initial Use <a name="prepare-initial-use"></a>
 
 Before we can start using OpenStack, we need to do few additional things such
 as installing OpenStack CLI clients and generating **admin-openrc.sh** file.
@@ -93,7 +109,9 @@ source /etc/kolla/admin-openrc.sh
 cat /etc/kolla/admin-openrc.sh
 ```
 
-## Use OpenStack with OpenStack Client
+# Basic OpenStack Usage <a name="use-openstack"></a>
+
+## Use OpenStack with OpenStack Client <a name="use-openstack-with-osc"></a>
 
 In this part of the workshop we will work with below OpenStack objects using
 OpenStack Client (OSC). [2]
@@ -238,7 +256,7 @@ sudo ip netns exec $IPNS ping 10.0.0.9       # this ip should match to the ip of
 sudo ip netns exec $IPNS ssh cirros@10.0.0.9 # password is gocubsgo
 ```
 
-## Use OpenStack via Horizon Dashboard
+## Use OpenStack via Horizon Dashboard <a name="use-openstack-with-horizon"></a>
 
 Our installation includes **Horizon** and we can access to it via port
 forwarding. Logout from jumphost and log back in using below command.
@@ -258,12 +276,12 @@ until you succeed logging in.
 Please expore the tabs **Compute** and **Network** where you can see
 the instances, images, keypairs, networks, routers and so on.
 
-# Next Steps
+# Next Steps <a name="next-steps"></a>
 
 You completed the OpenStack part of the workshop. You can now move to Kubernetes
 part by clicking [this link](https://github.com/fdegir/infra-workshop/tree/master/kubernetes).
 
-# References
+# References <a name="references"></a>
 
 1. https://docs.openstack.org/kolla-ansible/queens/user/quickstart.html
 2. https://docs.openstack.org/python-openstackclient/rocky/

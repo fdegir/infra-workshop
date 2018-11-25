@@ -2,7 +2,7 @@
 
 1. [Introduction](#introduction)
 2. [Prepare Jumphost](#prepare-jumphost)
-2.1 [Install Ansible](#install-ansible)
+   2.1. [Install Ansible](#install-ansible)
 3. [Next Steps](#next-steps)
 4. [References](#references)
 
