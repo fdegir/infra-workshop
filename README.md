@@ -46,7 +46,7 @@ ansible -i $HOME/infra-workshop/sample-inventory all -m raw -a "apt-get install 
 ansible -i $HOME/infra-workshop/sample-inventory all -a "uname -an"
 ```
 
-## Next Steps
+# Next Steps
 
 If everything went fine until this point, it means you are now ready to
 move to **OpenStack** part of the workshop. Please open the instructions by

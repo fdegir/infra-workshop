@@ -175,7 +175,7 @@ openstack network show ws-net
 openstack subnet list
 openstack subnet show ws-subnet
 openstack router list
-openstack router show
+openstack router show ws-router
 ```
 
 OpenStack Security Groups act as a virtual firewall for servers and other
@@ -234,19 +234,34 @@ controller00.
 ```bash
 ssh controller00
 IPNS=$(ip netns | grep qrouter)
-sudo ip netns exec $IPNS ping
+sudo ip netns exec $IPNS ping 10.0.0.9       # this ip should match to the ip of the instance
+sudo ip netns exec $IPNS ssh cirros@10.0.0.9 # password is gocubsgo
 ```
 
+## Use OpenStack via Horizon Dashboard
 
-for item in {network,subnet,router,server,flavor,image,keypair}; do
+Our installation includes **Horizon** and we can access to it via port
+forwarding. Logout from jumphost and log back in using below command.
+Please ensure you use the IP of your jumphost instance and point to
+private key you received.
 
-openstack
-openstack security group list
-openstack server create --flavor m1.tiny --image cirros --network demo-net --security-group <uuid> --key-name ws-key dummy5
+```bash
+ssh -L 8089:10.1.0.11:80 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
+grep 'OS_USERNAME\|OS_PASSWORD' /etc/kolla/admin-openrc.sh
+```
 
-sudo ip netns
-sudo ip netns qrouter-<uuid> ping <ip>
-sudo ip netns qrouter-<uuid> ssh cirros@<ip> (gocubsgo is the password)
+Open the url **http://localhost:8089** on your computer and enter the username
+and password you extracted in earlier step to login to Horizon dashboard. If
+you receive an error message, please enter the username and password again
+until you succeed logging in.
+
+Please expore the tabs **Compute** and **Network** where you can see
+the instances, images, keypairs, networks, routers and so on.
+
+# Next Steps
+
+You completed the OpenStack part of the workshop. You can now move to Kubernetes
+part by clicking [this link](https://github.com/fdegir/infra-workshop/tree/master/kubernetes).
 
 # References
 
