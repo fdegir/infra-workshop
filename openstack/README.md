@@ -8,8 +8,9 @@
 3. [Basic OpenStack Usage](#use-openstack)  
   3.1. [Use OpenStack with OpenStack Client](#use-openstack-with-osc)  
   3.2. [Use OpenStack with Horizon](#use-openstack-with-horizon)  
-4. [Next Steps](#next-steps)
-5. [References](#references)
+4. [Cleanup](#cleanup)
+5. [Next Steps](#next-steps)
+6. [References](#references)
 
 
 # Introduction <a name="introduction"></a>
@@ -276,13 +277,13 @@ until you succeed logging in.
 Please expore the tabs **Compute** and **Network** where you can see
 the instances, images, keypairs, networks, routers and so on.
 
-# Next Steps <a name="next-steps"></a>
+# Cleanup <a name="cleanup"></a>
 
 Before moving to the next part of the workshop, we need to cleanup the environment
 in order to ensure the existing OpenStack installation doesn't impact
 Kubernetes work.
 
-Please execute the command below on **jumphost**.
+Please execute the commands below on **jumphost**.
 
 ```bash
 source /etc/kolla/admin-openrc.sh
@@ -290,6 +291,8 @@ openstack server delete ws-instance1
 cd $HOME/infra-workshop/openstack
 kolla-ansible -i ./multinode destroy --include-images --yes-i-really-really-mean-it
 ```
+
+# Next Steps <a name="next-steps"></a>
 
 You completed the OpenStack part of the workshop. You can now move to Kubernetes
 part by clicking [this link](https://github.com/fdegir/infra-workshop/tree/master/kubernetes).
