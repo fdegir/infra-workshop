@@ -256,7 +256,7 @@ sudo ip netns exec $IPNS ping 10.0.0.9       # this ip should match to the ip of
 sudo ip netns exec $IPNS ssh cirros@10.0.0.9 # password is gocubsgo
 ```
 
-## Use OpenStack via Horizon Dashboard <a name="use-openstack-with-horizon"></a>
+## Use OpenStack with Horizon Dashboard <a name="use-openstack-with-horizon"></a>
 
 Our installation includes **Horizon** and we can access to it via port
 forwarding. Logout from jumphost and log back in using below command.
