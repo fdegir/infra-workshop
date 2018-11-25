@@ -23,18 +23,18 @@ installation with Kolla-Ansible. It would be useful if you take a look at it to
 see how it looks.
 
 ```bash
-cd infra-workshop/openstack
+cd $HOME/infra-workshop/openstack
 less multinode
 ansible -i multinode -m ping all
 ```
 
-sudo cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc/kolla/
 Kolla-Ansible passwords are stored in **/etc/kolla/passwords.yml** but all
 passwords are blank in this file so we need to fill them by using random
 password generator.
 
 ```bash
-sudo cp -R globals.yml /etc/kolla/globals.yml
+sudo cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc/
+sudo cp -f globals.yml /etc/kolla/globals.yml
 sudo kolla-genpwd
 cat /etc/kolla/password.yml
 ```
