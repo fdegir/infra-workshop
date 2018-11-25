@@ -2,7 +2,7 @@
 # additional groups are for more control of the environment.
 [control]
 # These hostname must be resolvable from your deployment host
-10.1.0.11 ansible_user=ubuntu ansible_become=true
+controller00 ansible_user=ubuntu ansible_become=true
 # The above can also be specified as follows:
 #control[01:03]     ansible_user=kolla
 
@@ -24,7 +24,7 @@ control
 [external-compute]
 
 [compute]
-10.1.0.12 ansible_user=ubuntu ansible_become=true
+compute00 ansible_user=ubuntu ansible_become=true
 
 [monitoring:children]
 control
@@ -38,7 +38,7 @@ control
 compute
 
 [deployment]
-localhost       ansible_connection=local
+jumphost00 ansible_connection=local
 
 [baremetal:children]
 control
