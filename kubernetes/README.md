@@ -179,7 +179,28 @@ kubectl describe deployment orders -n sock-shop
 kubectl describe service front-end -n sock-shop
 ```
 
+We can access to front-end of Sock Shop via port forwarding. Logout from jumphost
+and log back in using below command. Please ensure you use the IP of your jumphost
+instance and point to private key you received.
 
+```bash
+ssh -L 8089:10.1.0.11:80 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
+```
+
+Open the url **http://localhost:8089** on your browser and use **user**/**password**
+as username and password.
+
+We can install [WeaveScope](https://www.weave.works/docs/scope/latest/introducing/)
+to visualize Sock Shop application. First, please logout from jumphost and execute
+below commands.
+
+```bash
+ssh -L 8089:localhost:4040 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
+cd $HOME/infra-workshop/kubernetes
+curl https://cloud.weave.works/k8s/v1.10/scope.yaml | sed 's/cluster.local/ws.local/' > scope.yaml
+kubectl apply -f scope.yaml
+kubectl apply -f "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+```
 
 
 
