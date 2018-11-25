@@ -285,7 +285,10 @@ Kubernetes work.
 Please execute the command below on **jumphost**.
 
 ```bash
-kolla-ansible destroy --include-images --yes-i-really-really-mean-it
+source /etc/kolla/admin-openrc.sh
+openstack server delete ws-instance1
+cd $HOME/infra-workshop/openstack
+kolla-ansible -i ./multinode destroy --include-images --yes-i-really-really-mean-it
 ```
 
 You completed the OpenStack part of the workshop. You can now move to Kubernetes
