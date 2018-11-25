@@ -93,9 +93,10 @@ source /etc/kolla/admin-openrc.sh
 cat /etc/kolla/admin-openrc.sh
 ```
 
-## Use OpenStack
+## Use OpenStack with OpenStack Client
 
-In this part of the workshop we will work with below OpenStack resources.
+In this part of the workshop we will work with below OpenStack objects using
+OpenStack Client (OSC). [2]
 
 * network
 * security group
@@ -106,11 +107,20 @@ In this part of the workshop we will work with below OpenStack resources.
 * image
 * keypair
 
-Before doing anything else, we can start by listing available OpenStack Services
-and hypervisors.
+OSC accepts commands in below form
+
+```bash
+openstack [<global-options>] <object-1> <action> [<object-2>] [<command-arguments>]
+```
+
+More details regarding how to use OSC is available on [3].
+
+Before doing anything else, we can start by listing available OpenStack Services,
+users, and hypervisors.
 
 ```bash
 openstack service list
+openstack user list
 openstack hypervisor list
 ```
 
@@ -138,6 +148,7 @@ cd $HOME/infra-workshop/openstack
 wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
 openstack image create --disk-format qcow2 --container-format bare --public \
     --property os_type=linux --file cirros-0.4.0-x86_64-disk.img cirros
+openstack image list
 ```
 
 We then create our networks, subnets, and routers.
@@ -148,15 +159,83 @@ openstack network create --external --provider-physical-network physnet1 \
 openstack subnet create --no-dhcp \
     --allocation-pool start=10.0.2.150,end=10.0.2.199 --network ext-net \
     --subnet-range 10.0.2.0/24 --gateway 10.0.2.1 ext-subnet
-openstack network create --provider-network-type vxlan demo-net
-openstack subnet create --subnet-range 10.0.0.0/24 --network demo-net \
-    --gateway 10.0.0.1 --dns-nameserver 8.8.8.8 demo-subnet
-openstack router create demo-router
-openstack router add subnet demo-router demo-subnet
-openstack router set --external-gateway ext-net demo-router
+openstack network create --provider-network-type vxlan ws-net
+openstack subnet create --subnet-range 10.0.0.0/24 --network ws-net \
+    --gateway 10.0.0.1 --dns-nameserver 8.8.8.8 ws-subnet
+openstack router create ws-router
+openstack router add subnet ws-router ws-subnet
+openstack router set --external-gateway ext-net ws-router
 ```
 
+We created our networks, subnets, and router. Let's look at them using OSC.
 
+```bash
+openstack network list
+openstack network show ws-net
+openstack subnet list
+openstack subnet show ws-subnet
+openstack router list
+openstack router show
+```
+
+OpenStack Security Groups act as a virtual firewall for servers and other
+resources on a network. It is a container for security group rules which
+specify the network access rules.
+
+We need to adjust security group access rules so we can ping our instances
+and access them using SSH.
+
+```bash
+ADMIN_USER_ID=$(openstack user list | awk '/ admin / {print $2}')
+ADMIN_PROJECT_ID=$(openstack project list | awk '/ admin / {print $2}')
+ADMIN_SEC_GROUP=$(openstack security group list --project ${ADMIN_PROJECT_ID} | awk '/ default / {print $2}')
+openstack security group rule create --ingress --ethertype IPv4 \
+    --protocol icmp ${ADMIN_SEC_GROUP}
+openstack security group rule create --ingress --ethertype IPv4 \
+    --protocol tcp --dst-port 22 ${ADMIN_SEC_GROUP}
+openstack security group show ${ADMIN_SEC_GROUP}
+```
+
+In order for to login to our instances, we need our SSH key to be added
+to authorized_keys file on the instances. We use keypairs to achieve this.
+
+```bash
+openstack keypair create --public-key ~/.ssh/id_rsa.pub ws-key
+openstack keypair list
+```
+
+Before we create our first instance, we need to create flavors to use.
+
+```bash
+openstack flavor create --id 1 --ram 512 --disk 1 --vcpus 1 m1.tiny
+openstack flavor create --id 2 --ram 2048 --disk 20 --vcpus 1 m1.small
+openstack flavor list
+```
+
+We are now ready to create our first instance on our OpenStack!
+
+Below command creates an instance named ws-instance1 using cirros image with
+the m1.tiny flavor. It adds our public key to authorized_keys and connects it
+to the network ws-net.
+
+```bash
+openstack server create \
+    --image cirros \
+    --flavor m1.tiny \
+    --key-name ws-key \
+    --network ws-net \
+    ws-instance1
+openstack server list
+```
+
+Once the instance is created, we can ping it and login to it via SSH from node
+controller00.
+
+```bash
+ssh controller00
+IPNS=$(ip netns | grep qrouter)
+sudo ip netns exec $IPNS ping
+```
 
 
 for item in {network,subnet,router,server,flavor,image,keypair}; do
@@ -169,23 +248,8 @@ sudo ip netns
 sudo ip netns qrouter-<uuid> ping <ip>
 sudo ip netns qrouter-<uuid> ssh cirros@<ip> (gocubsgo is the password)
 
-modify globals.yaml
-kolla-ansible -i ./multinode bootstrap-servers <-- start: 02:44, end: 02:46
-kolla-ansible -i ./multinode prechecks <-- start: 02:47, end: 02:49
-kolla-ansible -i ./multinode deploy <-- start: 03:02, end: 03:19, restart: 03:19, reend: 03:27
-
-while deploying, do kolla images and kolla ps on controller node
-
-
-
-
-command examples
-openstack service list
-openstack server list
-openstack image list
-openstack flavor list
-openstack keypair list
-
 # References
 
 1. https://docs.openstack.org/kolla-ansible/queens/user/quickstart.html
+2. https://docs.openstack.org/python-openstackclient/rocky/
+3. https://docs.openstack.org/python-openstackclient/rocky/cli/commands.html
