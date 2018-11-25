@@ -35,7 +35,7 @@ sudo pip install kolla-ansible
 
 Kolla-Ansible installation contains example inventory which needs to be modified
 according to our environment. In order to save some time, an inventory file named
-**multinode** is available in openstack directory we we can use during OpenStack
+**multinode** is available in openstack directory which we can use during OpenStack
 installation with Kolla-Ansible. It would be useful if you take a look at it to
 see how it looks.
 
@@ -105,6 +105,7 @@ It would be good to take a look at generated admin-openrc.sh file as well.
 
 ```bash
 sudo pip install python-openstackclient python-glanceclient python-neutronclient
+openstack service list # <-- this will fail due to missing credentials
 kolla-ansible post-deploy
 source /etc/kolla/admin-openrc.sh
 cat /etc/kolla/admin-openrc.sh
