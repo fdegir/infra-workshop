@@ -38,7 +38,7 @@ control
 compute
 
 [deployment]
-jumphost00 ansible_connection=local
+jumphost ansible_connection=local
 
 [baremetal:children]
 control
