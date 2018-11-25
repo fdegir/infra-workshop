@@ -1,7 +1,7 @@
 # Table of Contents
 
 1. [Introduction](#introduction)
-2. [OpenStack Installation](#openstack-install-basic-usage)  
+2. [OpenStack Installation](#openstack-installation)  
   2.1. [Install and Configure Kolla-Ansible](#install-configure-kolla-ansible)  
   2.2. [Install OpenStack](#install-openstack)  
   2.3. [Prepare for Initial Use](#prepare-initial-use)  
@@ -14,7 +14,7 @@
 
 # Introduction <a name="introduction"></a>
 
-# OpenStack Installation and Basic Usage <a name="openstack-install-basic-usage"></a>
+# OpenStack Installation <a name="openstack-installation"></a>
 
 This guide contains information about installing **OpenStack Rocky** using
 Kolla-Ansible. Almost everything in this guide is taken from official
