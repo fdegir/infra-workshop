@@ -270,7 +270,7 @@ ssh -L 8089:10.1.0.11:80 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
 grep 'OS_USERNAME\|OS_PASSWORD' /etc/kolla/admin-openrc.sh
 ```
 
-Open the url **http://localhost:8089** on your computer and enter the username
+Open the url **http://localhost:8089** on your browser and enter the username
 and password you extracted in earlier step to login to Horizon dashboard. If
 you receive an error message, please enter the username and password again
 until you succeed logging in.
