@@ -77,8 +77,8 @@ kolla-ansible -i ./multinode deploy
 ```
 
 If you encounter issues while running the deployment, please rerun the above
-command as the issues are probably temporary and the installation will succeed
-next time.
+command as the issues are probably temporary and the installation will probably
+succeed.
 
 ## Prepare for Initial Use
 
@@ -94,6 +94,72 @@ cat /etc/kolla/admin-openrc.sh
 ```
 
 ## Use OpenStack
+
+In this part of the workshop we will work with below OpenStack resources.
+
+* network
+* security group
+* subnet
+* router
+* instance
+* flavor
+* image
+* keypair
+
+Before doing anything else, we can start by listing available OpenStack Services
+and hypervisors.
+
+```bash
+openstack service list
+openstack hypervisor list
+```
+
+We can also check if anything is available for use in our OpenStack instance.
+
+```bash
+openstack network list
+openstack security group list
+openstack subnet list
+openstack router list
+openstack server list
+openstack flavor list
+openstack image list
+openstack keypair list
+```
+
+As you see there, only the default security group is available. We will now
+create the rest of the resources as part of this exercise.
+
+We start by creating an image to use for our instances we will create on
+OpenStack. For this, we can use [Cirros](https://docs.openstack.org/image-guide/obtain-images.html).
+
+```bash
+cd $HOME/infra-workshop/openstack
+wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+openstack image create --disk-format qcow2 --container-format bare --public \
+    --property os_type=linux --file cirros-0.4.0-x86_64-disk.img cirros
+```
+
+We then create our networks, subnets, and routers.
+
+```bash
+openstack network create --external --provider-physical-network physnet1 \
+    --provider-network-type flat ext-net
+openstack subnet create --no-dhcp \
+    --allocation-pool start=10.0.2.150,end=10.0.2.199 --network ext-net \
+    --subnet-range 10.0.2.0/24 --gateway 10.0.2.1 ext-subnet
+openstack network create --provider-network-type vxlan demo-net
+openstack subnet create --subnet-range 10.0.0.0/24 --network demo-net \
+    --gateway 10.0.0.1 --dns-nameserver 8.8.8.8 demo-subnet
+openstack router create demo-router
+openstack router add subnet demo-router demo-subnet
+openstack router set --external-gateway ext-net demo-router
+```
+
+
+
+
+for item in {network,subnet,router,server,flavor,image,keypair}; do
 
 openstack
 openstack security group list
