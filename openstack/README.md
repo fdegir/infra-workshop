@@ -34,9 +34,11 @@ password generator.
 
 ```bash
 sudo cp -r /usr/local/share/kolla-ansible/etc_examples/kolla /etc/
+ls -al /etc/kolla
 sudo cp -f globals.yml /etc/kolla/globals.yml
+cat /etc/kolla/globals.yml
 sudo kolla-genpwd
-cat /etc/kolla/password.yml
+cat /etc/kolla/passwords.yml
 ```
 
 ## Install OpenStack
