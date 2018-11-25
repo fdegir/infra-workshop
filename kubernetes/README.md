@@ -197,23 +197,43 @@ below commands.
 ```bash
 ssh -L 8089:localhost:4040 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
 cd $HOME/infra-workshop/kubernetes
-curl https://cloud.weave.works/k8s/v1.10/scope.yaml | sed 's/cluster.local/ws.local/' > scope.yaml
 kubectl apply -f scope.yaml
-kubectl apply -f "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+kubectl port-forward -n weave "$(kubectl get -n weave pod --selector=weave-scope-component=app -o jsonpath='{.items..metadata.name}')" 4040
 ```
 
-
-
-
-
+Open the url **http://localhost:8089** on your browser and explore your cluster
+and application.
 
 ## Use Kubernetes with Kubernetes Dashboard <a name="use-kubernetes-with-dashboard"></a>
 
-TBD
+Our installation includes Kubernetes Dashboard and we can access to it via port
+forwarding. Logout from jumphost and log back in using below command. Please
+ensure you use the IP of your jumphost instance and point to private key you received.
+
+```bash
+kubectl get svc kubernetes-dashboard -n kube-system -o yaml |sed 's/ClusterIP/NodePort/' |kubectl replace -f -
+kubectl get service -n kube-system |grep kubernetes-dashboard | awk '{print $5}' |awk -F "[:/]" '{print $2}'
+```
+
+Please log out and log back in with port forwarding.
+
+```bash
+ssh -L 8089:10.1.0.11:<KUBERNETES_DASHBOARD_PORT> ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
+kubectl describe secret $(kubectl get secret | grep cluster-admin-dashboard-sa | cut -d" " -f 1)
+```
+
+Open the url **https://localhost:8089/#!/login** on your browser. Please ignore
+the warning and add an exception.
+
+Select **Token** as authentication method and paste the token you extracted above.
+
+Please expore the dashboard where you can see nodes, pods, deployments and so on.
+You can switch between namespaces to see others.
 
 # Next Steps <a name="next-steps"></a>
 
-TBD
+We have come to the end of the workshop so you can keep the deployment for
+another day and play with it. The nodes will be removed by EOB tomorrow.
 
 # References <a name="references"></a>
 
