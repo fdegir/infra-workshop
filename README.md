@@ -1,4 +1,15 @@
-# Prepare Jumphost
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [Prepare Jumphost](#prepare-jumphost)
+2.1 [Install Ansible](#install-ansible)
+3. [Next Steps](#next-steps)
+4. [References](#references)
+
+
+# Introduction <a name="introduction"></a>
+
+# Prepare Jumphost <a name="prepare-jumphost"></a>
 
 This section contains the installation and configuration steps that must be
 performed on Jumphost machine. The steps documented here are common for
@@ -13,7 +24,7 @@ in advance in order not to spend time creating or modifying them manually.
 git clone https://github.com/fdegir/infra-workshop.git
 ```
 
-## Install Ansible
+## Install Ansible <a name="install-ansible"></a>
 
 Both [Kolla Ansible](https://docs.openstack.org/kolla-ansible/queens/index.html)
 and [Kubespray](https://github.com/kubernetes-incubator/kubespray) use
@@ -46,11 +57,11 @@ ansible -i $HOME/infra-workshop/sample-inventory all -m raw -a "apt-get install 
 ansible -i $HOME/infra-workshop/sample-inventory all -a "uname -an"
 ```
 
-# Next Steps
+# Next Steps <a name="next-steps"></a>
 
 If everything went fine until this point, it means you are now ready to
 move to **OpenStack** part of the workshop. Please open the instructions by
 clicking [this link](https://github.com/fdegir/infra-workshop/tree/master/openstack).
 
-# References
+# References <a name="references"></a>
 1. https://docs.openstack.org/kolla-ansible/queens/user/quickstart.html
