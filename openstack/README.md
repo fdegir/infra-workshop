@@ -290,6 +290,14 @@ until you succeed logging in.
 Please expore the tabs **Compute** and **Network** where you can see
 the instances, images, keypairs, networks, routers and so on.
 
+Once you spent enough time on exploring the dashboard, please open **Network**
+-> **Network Topology** and click **Launch Instance** from the upper right
+corner of the page, creating an instance on the same network **ws-net** as
+the instance we created using OSC earlier.
+
+Since the instances are on the same network, you should be able to
+ping the instances from each other and login to them using SSH.
+
 # Cleanup <a name="cleanup"></a>
 
 Before moving to the next part of the workshop, we need to cleanup the environment
