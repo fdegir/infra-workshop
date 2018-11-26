@@ -195,7 +195,7 @@ and log back in using below command. Please ensure you use the IP of your jumpho
 instance and point to private key you received.
 
 ```bash
-ssh -L 8089:10.1.0.11:80 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
+ssh -L 8089:10.1.0.11:30001 ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
 ```
 
 Open the url **http://localhost:8089** on your browser and use **user**/**password**
