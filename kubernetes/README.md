@@ -14,14 +14,20 @@
 
 # Introduction <a name="introduction"></a>
 
-This guide contains information about installing **Kubernetes 1.11.3** using
-Kubespray. Almost everything in this guide is taken from official Kubespray
+This guide contains information about installing **Kubernetes** using
+Kubespray and basic usage of Kubernetes with kubectl and Kubernetes
+Dashboard. The version we are going to install is **1.11.3**.
+
+Information in this guide is based on official Kubespray
 documentation and adapted for the purposes of this workshop. [1]
 
 All the commands listed on this guide must be executed on Jumphost unless
 otherwise is noted.
 
 # Kubernetes Installation <a name="kubernetes-installation"></a>
+
+This section covers the details to configure and use Kubespray,
+install Kubernetes, and prepare it for the initial use.
 
 ## Clone Kubespray Repo and Configure Kubespray <a name="clone-configure-kubespray"></a>
 
@@ -48,8 +54,8 @@ sudo pip install -r requirements.txt
 Kubespray requires inventory to operate on nodes so we need to generate
 inventory file for our environment. In order to save some time, an inventory
 file named hosts.ini is available in kubernetes directory which we can use
-during Kubernetes installation with Kubespray. It would be useful if you take
-a look at it to see how it looks.
+during Kubernetes installation with Kubespray. It would be useful to take
+a look at it.
 
 ```bash
 cp -rfp inventory/sample inventory/ws
@@ -99,6 +105,10 @@ cp inventory/ws/artifacts/admin.conf ~/.kube/config
 ```
 
 # Basic Kubernetes Usage <a name="use-kubernetes"></a>
+
+The usage instuctions on this section is pretty basic on purpose since
+our aim is to exercise how to bring up the infrastructure for our purposes
+You can always refer to official documentation for more details.
 
 ## Use Kubernetes with kubectl <a name="use-kubernetes-with-kubectl"></a>
 

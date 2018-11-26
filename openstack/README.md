@@ -15,14 +15,21 @@
 
 # Introduction <a name="introduction"></a>
 
+This guide contains information about installing **OpenStack** using
+Kolla-Ansible and basic usage of OpenStack with OpenStack Client and
+Horizon Dashboard. The version we are going to install is the latest
+released version of OpenStack, **Rocky**.
+
+Information in this guide is based on official Kolla-Ansible
+documentation and adapted for the purposes of this workshop. [1]
+
+All the commands listed on this guide must be executed on jumphost unless
+otherwise is noted.
+
 # OpenStack Installation <a name="openstack-installation"></a>
 
-This guide contains information about installing **OpenStack Rocky** using
-Kolla-Ansible. Almost everything in this guide is taken from official
-Kolla-Ansible documentation and adapted for the purposes of this workshop. [1]
-
-All the commands listed on this guide must be executed on Jumphost unless
-otherwise is noted.
+This section covers the details to install and configure Kolla-Ansible,
+install OpenStack, and prepare it for the initial use.
 
 ## Install and Configure Kolla-Ansible <a name="install-configure-kolla-ansible"></a>
 
@@ -36,8 +43,7 @@ sudo pip install kolla-ansible
 Kolla-Ansible installation contains example inventory which needs to be modified
 according to our environment. In order to save some time, an inventory file named
 **multinode** is available in openstack directory which we can use during OpenStack
-installation with Kolla-Ansible. It would be useful if you take a look at it to
-see how it looks.
+installation with Kolla-Ansible. It would be useful to take a look at it.
 
 ```bash
 cd $HOME/infra-workshop/openstack
@@ -47,7 +53,7 @@ ansible -i multinode -m ping all
 
 Kolla-Ansible installation configuration is kept in **/etc/kolla/globals.yml**.
 We will use a configuration file created for the purposes of this workshop named
-**globals.yml** and located in openstack directory.
+**globals.yml** and located in openstack directory of the infra-workshop repo.
 
 Kolla-Ansible passwords are stored in **/etc/kolla/passwords.yml** but all
 passwords are blank in this file so we need to fill them by using random
@@ -94,7 +100,7 @@ kolla-ansible -i ./multinode deploy
 ```
 
 If you encounter issues while running the deployment, please rerun the above
-command as the issues are probably temporary and the installation will probably
+command as the issues are probably temporary and the installation will
 succeed.
 
 ## Prepare for Initial Use <a name="prepare-initial-use"></a>
@@ -112,6 +118,10 @@ cat /etc/kolla/admin-openrc.sh
 ```
 
 # Basic OpenStack Usage <a name="use-openstack"></a>
+
+The usage instuctions on this section is pretty basic on purpose since
+our aim is to exercise how to bring up the infrastructure for our purposes
+You can always refer to official documentation for more details.
 
 ## Use OpenStack with OpenStack Client <a name="use-openstack-with-osc"></a>
 
@@ -135,7 +145,7 @@ openstack [<global-options>] <object-1> <action> [<object-2>] [<command-argument
 
 More details regarding how to use OSC is available on [3].
 
-Before doing anything else, we can start by listing available OpenStack Services,
+Before doing anything else, we can start by listing available OpenStack services,
 users, and hypervisors.
 
 ```bash
@@ -203,7 +213,7 @@ resources on a network. It is a container for security group rules which
 specify the network access rules.
 
 We need to adjust security group access rules so we can ping our instances
-and access them using SSH.
+and login to them using SSH.
 
 ```bash
 ADMIN_USER_ID=$(openstack user list | awk '/ admin / {print $2}')
@@ -217,7 +227,8 @@ openstack security group show ${ADMIN_SEC_GROUP}
 ```
 
 In order for to login to our instances, we need our SSH key to be added
-to authorized_keys file on the instances. We use keypairs to achieve this.
+to authorized_keys file on the instances. We use keypairs to achieve this
+so the our public key can be injected to instances.
 
 ```bash
 openstack keypair create --public-key ~/.ssh/id_rsa.pub ws-key
