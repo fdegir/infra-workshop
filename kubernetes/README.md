@@ -95,13 +95,14 @@ sudo apt-get update
 sudo apt-get install -y kubectl
 ```
 
-Kubectl expects Kubernetes cluster details to be available as **~/.kube/config** so
-we need to make this directory and copy it from kubespray folder to there.
+Kubectl expects Kubernetes cluster details to be available as **$HOME/kube/config** so
+we need to make this directory and copy the generated admin.conf to there.
 
 ```bash
 kubectl get nodes # <-- this will fail due to missing cluster details
 mkdir $HOME/.kube
-cp inventory/ws/artifacts/admin.conf ~/.kube/config
+cp inventory/ws/artifacts/admin.conf $HOME/kube/config
+kubectl get nodes # <-- this should work
 ```
 
 # Basic Kubernetes Usage <a name="use-kubernetes"></a>
@@ -242,8 +243,10 @@ You can switch between namespaces to see others.
 
 # Next Steps <a name="next-steps"></a>
 
-We have come to the end of the workshop so you can keep the deployment for
-another day and play with it. The nodes will be removed by EOB tomorrow.
+We have come to the end of the workshop so you can keep the nodes for another
+day and follow the steps and try more stuff on them.
+
+The nodes will be removed by EOB tomorrow.
 
 # References <a name="references"></a>
 
