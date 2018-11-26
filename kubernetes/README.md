@@ -207,15 +207,15 @@ and application.
 ## Use Kubernetes with Kubernetes Dashboard <a name="use-kubernetes-with-dashboard"></a>
 
 Our installation includes Kubernetes Dashboard and we can access to it via port
-forwarding. Logout from jumphost and log back in using below command. Please
-ensure you use the IP of your jumphost instance and point to private key you received.
+forwarding.
 
 ```bash
 kubectl get svc kubernetes-dashboard -n kube-system -o yaml |sed 's/ClusterIP/NodePort/' |kubectl replace -f -
 kubectl get service -n kube-system |grep kubernetes-dashboard | awk '{print $5}' |awk -F "[:/]" '{print $2}'
 ```
 
-Please log out and log back in with port forwarding.
+Please log out and log back in with port forwarding. You need to use the IP
+of your jumphost instance and point to private key you received.
 
 ```bash
 ssh -L 8089:10.1.0.11:<KUBERNETES_DASHBOARD_PORT> ubuntu@<IP_OF_JUMPHOST> -i <PATH_TO_SSH_PRIVATE_KEY>
