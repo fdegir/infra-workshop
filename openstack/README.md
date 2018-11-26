@@ -308,7 +308,8 @@ Please execute the commands below on **jumphost**.
 
 ```bash
 source /etc/kolla/admin-openrc.sh
-openstack server delete ws-instance1
+openstack server list
+openstack server delete ws-instance1 # ensure you delete all the instances you created
 cd $HOME/infra-workshop/openstack
 kolla-ansible -i ./multinode destroy --include-images --yes-i-really-really-mean-it
 ```
