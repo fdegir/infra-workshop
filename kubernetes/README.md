@@ -101,7 +101,7 @@ we need to make this directory and copy the generated admin.conf to there.
 ```bash
 kubectl get nodes # <-- this will fail due to missing cluster details
 mkdir $HOME/.kube
-cp inventory/ws/artifacts/admin.conf $HOME/kube/config
+cp inventory/ws/artifacts/admin.conf $HOME/.kube/config
 kubectl get nodes # <-- this should work
 ```
 
