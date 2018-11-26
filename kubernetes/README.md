@@ -218,7 +218,17 @@ and application.
 ## Use Kubernetes with Kubernetes Dashboard <a name="use-kubernetes-with-dashboard"></a>
 
 Our installation includes Kubernetes Dashboard and we can access to it via port
-forwarding.
+forwarding. But before doing that, we need to create a service account for dashboard
+access.
+
+```bash
+kubectl create serviceaccount cluster-admin-dashboard-sa
+kubectl create clusterrolebinding cluster-admin-dashboard-sa \
+   --clusterrole=cluster-admin --serviceaccount=default:cluster-admin-dashboard-sa
+```
+
+Now we can change kubernetes-dashboard to use NodePort insted of ClusterIP and
+get the dashboard port.
 
 ```bash
 kubectl get svc kubernetes-dashboard -n kube-system -o yaml |sed 's/ClusterIP/NodePort/' |kubectl replace -f -
