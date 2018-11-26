@@ -259,7 +259,8 @@ openstack server create \
 openstack server list
 ```
 
-Once the instance is created, we can ping it and login to it via SSH from node
+Once the instance status becomes ACTIVE in openstack server list
+command output, we can ping it and login to it via SSH from node
 controller00.
 
 ```bash
