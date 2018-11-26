@@ -16,10 +16,10 @@
 
 This guide contains information about installing **Kubernetes** using
 Kubespray and basic usage of Kubernetes with kubectl and Kubernetes
-Dashboard. The version we are going to install is **1.11.3**.
+Dashboard. The version we are going to install is **1.11.3**. [1]
 
 Information in this guide is based on official Kubespray
-documentation and adapted for the purposes of this workshop. [1]
+documentation and adapted for the purposes of this workshop. [2]
 
 All the commands listed on this guide must be executed on Jumphost unless
 otherwise is noted.
@@ -113,7 +113,7 @@ You can always refer to official documentation for more details.
 ## Use Kubernetes with kubectl <a name="use-kubernetes-with-kubectl"></a>
 
 In this part of the workshop we will work with below Kubernetes resource types
-using kubectl. [2]
+using kubectl. [3]
 
 * deployments
 * services
@@ -247,6 +247,6 @@ another day and play with it. The nodes will be removed by EOB tomorrow.
 
 # References <a name="references"></a>
 
-1. https://github.com/kubernetes-incubator/kubespray
-2. https://kubernetes.io/docs/reference/kubectl/overview/
-3. https://microservices-demo.github.io/
+1. https://github.com/kubernetes-incubator/kubespray/releases
+2. https://github.com/kubernetes-incubator/kubespray
+3. https://kubernetes.io/docs/reference/kubectl/overview/

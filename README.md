@@ -42,7 +42,7 @@ sudo pip install -U pip==9.0.3
 We can now install Ansible.
 
 ```bash
-sudo pip install ansible==2.5.8
+sudo pip install ansible==2.5.8 # Kubespray has issues with 2.7 so we choose a known version
 ```
 
 We can use existing inventory to install python-dev package on target nodes

@@ -18,10 +18,10 @@
 This guide contains information about installing **OpenStack** using
 Kolla-Ansible and basic usage of OpenStack with OpenStack Client and
 Horizon Dashboard. The version we are going to install is the latest
-released version of OpenStack, **Rocky**.
+released version of OpenStack, **Rocky**. [1]
 
 Information in this guide is based on official Kolla-Ansible
-documentation and adapted for the purposes of this workshop. [1]
+documentation and adapted for the purposes of this workshop. [2]
 
 All the commands listed on this guide must be executed on jumphost unless
 otherwise is noted.
@@ -126,7 +126,7 @@ You can always refer to official documentation for more details.
 ## Use OpenStack with OpenStack Client <a name="use-openstack-with-osc"></a>
 
 In this part of the workshop we will work with below OpenStack objects using
-OpenStack Client (OSC). [2]
+OpenStack Client (OSC). [3]
 
 * network
 * security group
@@ -143,7 +143,7 @@ OSC accepts commands in below form
 openstack [<global-options>] <object-1> <action> [<object-2>] [<command-arguments>]
 ```
 
-More details regarding how to use OSC is available on [3].
+More details regarding how to use OSC is available on [4].
 
 Before doing anything else, we can start by listing available OpenStack services,
 users, and hypervisors.
@@ -266,7 +266,7 @@ controller00.
 ssh controller00
 IPNS=$(ip netns | grep qrouter)
 sudo ip netns exec $IPNS ping 10.0.0.9       # this ip should match to the ip of the instance
-sudo ip netns exec $IPNS ssh cirros@10.0.0.9 # password is gocubsgo
+sudo ip netns exec $IPNS ssh cirros@10.0.0.9 # password is gocubsgo and use the right ip
 ```
 
 ## Use OpenStack with Horizon Dashboard <a name="use-openstack-with-horizon"></a>
@@ -311,6 +311,7 @@ part by clicking [this link](https://github.com/fdegir/infra-workshop/tree/maste
 
 # References <a name="references"></a>
 
-1. https://docs.openstack.org/kolla-ansible/queens/user/quickstart.html
-2. https://docs.openstack.org/python-openstackclient/rocky/
-3. https://docs.openstack.org/python-openstackclient/rocky/cli/commands.html
+1. https://releases.openstack.org/rocky/index.html
+2. https://docs.openstack.org/kolla-ansible/queens/user/quickstart.html
+3. https://docs.openstack.org/python-openstackclient/rocky/
+4. https://docs.openstack.org/python-openstackclient/rocky/cli/commands.html
