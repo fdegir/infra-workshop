@@ -103,6 +103,56 @@ If you encounter issues while running the deployment, please rerun the above
 command as the issues are probably temporary and the installation will
 succeed.
 
+Once the playbook execution is completed successfully, you should
+see 28 running containers on controller00 and 10 running containers
+on compute00.
+
+```bash
+ubuntu@controller00:~$ docker ps
+CONTAINER ID        IMAGE                                                 COMMAND             CREATED              STATUS              PORTS               NAMES
+67ffab96a245        kolla/ubuntu-source-horizon:rocky                     "kolla_start"       22 seconds ago       Up 21 seconds                           horizon
+9d53d3890344        kolla/ubuntu-source-heat-engine:rocky                 "kolla_start"       59 seconds ago       Up 58 seconds                           heat_engine
+35ee6f3ebb43        kolla/ubuntu-source-heat-api-cfn:rocky                "kolla_start"       About a minute ago   Up About a minute                       heat_api_cfn
+448b092b7bdd        kolla/ubuntu-source-heat-api:rocky                    "kolla_start"       About a minute ago   Up About a minute                       heat_api
+6d51554bb71d        kolla/ubuntu-source-neutron-metadata-agent:rocky      "kolla_start"       2 minutes ago        Up 2 minutes                            neutron_metadata_agent
+9bb0666885f9        kolla/ubuntu-source-neutron-l3-agent:rocky            "kolla_start"       2 minutes ago        Up 2 minutes                            neutron_l3_agent
+a35bc922b0c5        kolla/ubuntu-source-neutron-dhcp-agent:rocky          "kolla_start"       3 minutes ago        Up 3 minutes                            neutron_dhcp_agent
+98b24eae4153        kolla/ubuntu-source-neutron-openvswitch-agent:rocky   "kolla_start"       3 minutes ago        Up 3 minutes                            neutron_openvswitch_agent
+86f18aec214a        kolla/ubuntu-source-neutron-server:rocky              "kolla_start"       3 minutes ago        Up 3 minutes                            neutron_server
+ee11881dda6c        kolla/ubuntu-source-openvswitch-vswitchd:rocky        "kolla_start"       8 minutes ago        Up 8 minutes                            openvswitch_vswitchd
+138e4b6f8bd1        kolla/ubuntu-source-openvswitch-db-server:rocky       "kolla_start"       13 minutes ago       Up 13 minutes                           openvswitch_db
+1e12963ddedf        kolla/ubuntu-source-nova-novncproxy:rocky             "kolla_start"       17 minutes ago       Up 17 minutes                           nova_novncproxy
+c3396b744c36        kolla/ubuntu-source-nova-consoleauth:rocky            "kolla_start"       17 minutes ago       Up 17 minutes                           nova_consoleauth
+3c3744bd8809        kolla/ubuntu-source-nova-conductor:rocky              "kolla_start"       17 minutes ago       Up 17 minutes                           nova_conductor
+cdb54bc51775        kolla/ubuntu-source-nova-scheduler:rocky              "kolla_start"       17 minutes ago       Up 17 minutes                           nova_scheduler
+50c20e284fab        kolla/ubuntu-source-nova-api:rocky                    "kolla_start"       17 minutes ago       Up 17 minutes                           nova_api
+db0821845151        kolla/ubuntu-source-nova-placement-api:rocky          "kolla_start"       17 minutes ago       Up 17 minutes                           placement_api
+0bf4dd6bf40a        kolla/ubuntu-source-glance-api:rocky                  "kolla_start"       22 minutes ago       Up 22 minutes                           glance_api
+ff17ba84252d        kolla/ubuntu-source-keystone-fernet:rocky             "kolla_start"       24 minutes ago       Up 24 minutes                           keystone_fernet
+4d4a91d7685c        kolla/ubuntu-source-keystone-ssh:rocky                "kolla_start"       25 minutes ago       Up 25 minutes                           keystone_ssh
+d7653e9be45c        kolla/ubuntu-source-keystone:rocky                    "kolla_start"       25 minutes ago       Up 25 minutes                           keystone
+c844a3b107bb        kolla/ubuntu-source-rabbitmq:rocky                    "kolla_start"       27 minutes ago       Up 27 minutes                           rabbitmq
+e9241557dae8        kolla/ubuntu-source-mariadb:rocky                     "kolla_start"       27 minutes ago       Up 27 minutes                           mariadb
+ac1a1a90fb56        kolla/ubuntu-source-memcached:rocky                   "kolla_start"       28 minutes ago       Up 28 minutes                           memcached
+ee65e0151b8c        kolla/ubuntu-source-chrony:rocky                      "kolla_start"       29 minutes ago       Up 29 minutes                           chrony
+2f5a5a2607ae        kolla/ubuntu-source-cron:rocky                        "kolla_start"       29 minutes ago       Up 29 minutes                           cron
+9c301fc69f61        kolla/ubuntu-source-kolla-toolbox:rocky               "kolla_start"       29 minutes ago       Up 29 minutes                           kolla_toolbox
+1184af1fd296        kolla/ubuntu-source-fluentd:rocky                     "kolla_start"       30 minutes ago       Up 30 minutes                           fluentd
+
+ubuntu@compute00:~$ docker ps
+CONTAINER ID        IMAGE                                                 COMMAND             CREATED             STATUS              PORTS               NAMES
+0d564499f14f        kolla/ubuntu-source-neutron-openvswitch-agent:rocky   "kolla_start"       4 minutes ago       Up 4 minutes                            neutron_openvswitch_agent
+a9ba482e9be0        kolla/ubuntu-source-openvswitch-vswitchd:rocky        "kolla_start"       9 minutes ago       Up 9 minutes                            openvswitch_vswitchd
+6bdf353e653a        kolla/ubuntu-source-openvswitch-db-server:rocky       "kolla_start"       9 minutes ago       Up 9 minutes                            openvswitch_db
+b21c21eeb106        kolla/ubuntu-source-nova-compute:rocky                "kolla_start"       17 minutes ago      Up 17 minutes                           nova_compute
+98b1e29e6380        kolla/ubuntu-source-nova-libvirt:rocky                "kolla_start"       18 minutes ago      Up 18 minutes                           nova_libvirt
+6a2b6d06fa6b        kolla/ubuntu-source-nova-ssh:rocky                    "kolla_start"       19 minutes ago      Up 19 minutes                           nova_ssh
+2340aaeffa0a        kolla/ubuntu-source-chrony:rocky                      "kolla_start"       30 minutes ago      Up 30 minutes                           chrony
+3859b5a6e3aa        kolla/ubuntu-source-cron:rocky                        "kolla_start"       30 minutes ago      Up 30 minutes                           cron
+7e9b3dd0ce65        kolla/ubuntu-source-kolla-toolbox:rocky               "kolla_start"       30 minutes ago      Up 30 minutes                           kolla_toolbox
+a48f7d0da532        kolla/ubuntu-source-fluentd:rocky                     "kolla_start"       31 minutes ago      Up 31 minutes                           fluentd
+```
+
 ## Prepare for Initial Use <a name="prepare-initial-use"></a>
 
 Before we can start using OpenStack, we need to do few additional things such
