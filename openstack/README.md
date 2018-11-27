@@ -107,8 +107,15 @@ Once the playbook execution is completed successfully, you should
 see 28 running containers on controller00 and 10 running containers
 on compute00.
 
+In order to be able to user docker on controller00 and compute00,
+ubuntu user needs to be added to docker group on both nodes.
+
 ```bash
-ubuntu@controller00:~$ docker ps
+ssh controller00
+sudo usermod -aG docker ubuntu
+logout
+ssh controller00
+docker ps
 CONTAINER ID        IMAGE                                                 COMMAND             CREATED              STATUS              PORTS               NAMES
 67ffab96a245        kolla/ubuntu-source-horizon:rocky                     "kolla_start"       22 seconds ago       Up 21 seconds                           horizon
 9d53d3890344        kolla/ubuntu-source-heat-engine:rocky                 "kolla_start"       59 seconds ago       Up 58 seconds                           heat_engine
@@ -139,7 +146,11 @@ ee65e0151b8c        kolla/ubuntu-source-chrony:rocky                      "kolla
 9c301fc69f61        kolla/ubuntu-source-kolla-toolbox:rocky               "kolla_start"       29 minutes ago       Up 29 minutes                           kolla_toolbox
 1184af1fd296        kolla/ubuntu-source-fluentd:rocky                     "kolla_start"       30 minutes ago       Up 30 minutes                           fluentd
 
-ubuntu@compute00:~$ docker ps
+ssh compute00
+sudo usermod -aG docker ubuntu
+logout
+ssh compute00
+docker ps
 CONTAINER ID        IMAGE                                                 COMMAND             CREATED             STATUS              PORTS               NAMES
 0d564499f14f        kolla/ubuntu-source-neutron-openvswitch-agent:rocky   "kolla_start"       4 minutes ago       Up 4 minutes                            neutron_openvswitch_agent
 a9ba482e9be0        kolla/ubuntu-source-openvswitch-vswitchd:rocky        "kolla_start"       9 minutes ago       Up 9 minutes                            openvswitch_vswitchd
