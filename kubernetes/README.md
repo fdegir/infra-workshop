@@ -244,7 +244,7 @@ kubectl describe secret $(kubectl get secret | grep cluster-admin-dashboard-sa |
 ```
 
 Open the url **https://localhost:8089/#!/login** on your browser. Please ignore
-the warning and add an exception.
+the warning and add an exception. You need to use **Firefox** in order to add exception.
 
 Select **Token** as authentication method and paste the token you extracted above.
 
