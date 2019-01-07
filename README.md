@@ -34,6 +34,7 @@ This section contains instructions to install and configure Ansible version
 We first install the packages required by Ansible.
 
 ```bash
+sudo apt update && sudo apt upgrade -y
 sudo apt-get install -y python-pip python-dev libffi-dev gcc \
     libssl-dev python-selinux
 sudo pip install -U pip==9.0.3
