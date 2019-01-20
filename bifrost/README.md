@@ -2,6 +2,7 @@
 
 1. [Introduction](#introduction)
 2. [Prepare Jumphost](#prepare-jumphost)  
+3. [Creating Virtual Machine](#create-vms)  
 
 
 # Introduction <a name="introduction"></a>
@@ -75,7 +76,8 @@ install required packages, and enable & start libvirtd service. Please
 answer N to the question you'll be asked during package installation.
 
 ```bash
-sudo apt install -y libvirt-bin
+sudo apt install -y libvirt-bin virtinst
+libguestfs-tools???????
 sudo systemctl start libvirtd
 sudo systemctl enable libvirtd
 sudo systemctl status libvirtd
@@ -101,6 +103,94 @@ sudo apt-get install -y python-pip python-dev libffi-dev gcc \
 sudo pip install -U pip==9.0.3
 sudo pip install ansible==2.5.8
 ```
+
+# Creating Virtual Machines <a name="create-vms"></a>
+
+In this section, we will create the virtual machines we will provision
+and bootstrap for the rest of the workshop.
+
+We will create the VMs in 2 different ways; using virt-install and
+virsh.
+
+Before creating the VMs, we need to create disks for them.
+
+```bash
+mkdir /home/ubuntu/images
+qemu-img create -f qcow2 /home/ubuntu/images/controller00.qcow2 10G
+qemu-img create -f qcow2 /home/ubuntu/images/compute00.qcow2 10G
+```
+
+Let's start with virt-install. Below command creates VM controller00
+with the details specific in the command. As you will see there, the
+boot device is set as PXE.
+
+```bash
+virt-install --name controller00 \
+  --virt-type kvm \
+  --vcpus 1 \
+  --cpu host-model \
+  --memory 1024 \
+  --os-type linux \
+  --disk /home/ubuntu/images/controller00.qcow2,format=qcow2,size=10,bus=virtio \
+  --network network=default,model=virtio \
+  --boot network,hd,menu=off,useserial=yes \
+  --events on_poweroff=destroy,on_reboot=restart,on_crash=restart \
+  --graphics none \
+  --hvm \
+  --noautoconsole
+```
+
+After creating the VM controller00, we need to edit the domain and ensure the VM
+reboots until it finds a boot device. Please issue the command below
+
+```bash
+virsh destory
+virsh edit controller00
+```
+
+and update the line
+
+```bash
+<bios useserial='yes' />
+```
+
+as
+
+```bash
+<bios useserial='yes' rebootTimeout='10000' />
+```
+
+save and start the domain.
+
+```bash
+virsh start controller00
+```
+
+Second VM, compute00, will be created using virsh.
+
+```bash
+virsh define $HOME/infra-workshop/bifrost/xml/compute00.xml
+virsh start compute00
+```
+
+Let us look at the VMs we created.
+
+```bash
+virsh list --all
+```
+
+We can also see that the VMs attempt to do PXE-boot, fails and
+they get restarted due to the setting **rebootTimeout** we set.
+
+```bash
+sudo tcpdump -i virbr0
+```
+
+We not have our VMs ready to be provisioned and bootstrapped so
+we can proceed with Bifrost installation and configuration.
+
+
+
 
 # Next Steps <a name="next-steps"></a>
 
