@@ -115,19 +115,28 @@ ls -al /usr/share/qemu/sgabios.bin # if the file doesn't exist, sudo cp /usr/sha
 ```
 
 The default network created by libvirt during its installation conflicts
-with what we will be doing so we need to remove that network and create
-one for us to use for PXE booting.
+with what we will be doing so we need to remove that network.
 
 ```bash
 virsh net-list --all
 ip a s
 virsh net-destroy default
 virsh net-undefine default
-virsh net-define $HOME/infra-workshop/bifrost/files/pxe-network.xml
-virsh net-autostart pxe
-virsh net-start pxe
+```
+
+The VMs we will create and provision will have 3 network interfaces
+connected to pxe/admin, management, and neutron external networks so
+we create those networks.
+
+```bash
+networks="pxe mgmt ext"
+for network in $networks; do
+virsh net-define $HOME/infra-workshop/bifrost/files/${network}-network.xml
+virsh net-autostart $network
+virsh net-start $network
+done
 virsh net-list --all
-ip a s # you should see br-pxe and not virbr0
+ip a s # you should see br_pxe, br_mgmt, br_ext and not virbr0
 ```
 
 We now need to create a new pool in order for us to create volumes
@@ -174,11 +183,11 @@ order
   </os>
 ```
 
-and the network the interface is attached to.
+and the interface that is attached to pxe network.
 
 ```xml
     <interface type='network'>
-      <source network='pxe' bridge='br-pxe'/>
+      <source network='pxe' bridge='br_pxe'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
     </interface>
@@ -192,6 +201,8 @@ with the help of Virtual BMC.
 virsh define $HOME/infra-workshop/bifrost/files/controller00.xml
 virsh define $HOME/infra-workshop/bifrost/files/compute00.xml
 virsh list --all
+virsh dominfo controller00
+virsh dominfo compute00
 ```
 
 In order for the workshop to be realistic, the machine power control
@@ -225,8 +236,8 @@ the commands below.
 
 ```bash
 sudo vbmc list
-virsh dumpxml controller00 | grep 'mac address'
-virsh dumpxml compute00 | grep 'mac address'
+virsh domiflist controller00
+virsh domiflist compute00
 ```
 
 # Bifrost Installation <a name="bifrost-installation"></a>
@@ -280,7 +291,7 @@ dnsmasq processes.
 
 ```bash
 sudo killall -w dnsmasq
-pgrep -i dnsmasq
+pgrep dnsmasq
 ```
 
 Bifrost installation can be done with existing playbooks but one can create
@@ -320,11 +331,11 @@ done
 ```
 
 On second console window, login to your machine and issue below command
-to see the traffic going through the bridge, br-pxe, which will show
+to see the traffic going through the bridge, br_pxe, which will show
 all the DHCP, and boot requests coming from VMs and so on.
 
 ```bash
-sudo tcpdump -i br-pxe
+sudo tcpdump -i br_pxe
 ```
 
 The first thing we need to do is to enroll our nodes in Ironic using Bifrost.
@@ -333,7 +344,7 @@ operation with Ironic.
 
 ```bash
 cd $HOME/bifrost/playbooks
-ansible-playbook -vvv -i inventory/bifrost_inventory.py enroll-dynamic.yaml -e network_interface=br-pxe
+ansible-playbook -vvv -i inventory/bifrost_inventory.py enroll-dynamic.yaml -e network_interface=br_pxe
 ```
 
 You should see your nodes to appear in the output of ironic command on
@@ -343,7 +354,7 @@ We can start deployment now.
 
 ```bash
 cd $HOME/bifrost/playbooks
-ansible-playbook -vvv -i inventory/bifrost_inventory.py deploy-dynamic.yaml -e network_interface=br-pxe
+ansible-playbook -vvv -i inventory/bifrost_inventory.py deploy-dynamic.yaml -e network_interface=br_pxe
 ```
 
 On first console, you should see the different states nodes go through, change

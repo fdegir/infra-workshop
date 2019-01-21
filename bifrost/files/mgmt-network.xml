@@ -1,0 +1,9 @@
+<network>
+  <name>mgmt</name>
+  <bridge name='br_mgmt' stp='on' delay='0'/>
+  <ip address='10.10.0.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.10.0.2' end='10.10.0.200'/>
+    </dhcp>
+  </ip>
+</network>

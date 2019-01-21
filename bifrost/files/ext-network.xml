@@ -1,0 +1,9 @@
+<network>
+  <name>ext</name>
+  <bridge name='br_ext' stp='on' delay='0'/>
+  <ip address='10.20.0.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.20.0.2' end='10.20.0.200'/>
+    </dhcp>
+  </ip>
+</network>
