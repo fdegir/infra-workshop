@@ -13,7 +13,8 @@ and tailored for the objectives of the workshop and the environment it is
 expected to be run on.
 
 Information in this guide is based on official Bifrost documentation and
-adapted for the purposes of this workshop. [1]
+adapted for the purposes of this workshop. [1] Information from OPNFV XCI
+is also incorporated into the documentation. [2]
 
 All the commands listed on this guide must be executed on Jumphost unless
 otherwise is noted.
@@ -35,8 +36,8 @@ in advance in order not to spend time creating or modifying them manually.
 git clone https://github.com/fdegir/infra-workshop.git $HOME/infra-workshop
 ```
 
-Before doing anything else, it is a good idea to update the system, install
-required packages and fix some annoying warning messages.
+As usual, we update the system, install required packages and fix some
+of the issues in advance before we face them.
 
 ```bash
 sudo apt update && sudo apt upgrade -y
@@ -50,7 +51,7 @@ sudo bash -c "sed -i -e '/127.0.0.1/s/$/ bifrost/' /etc/hosts"
 ```
 
 Our SSH key will be injected to the built image in order for us to login
-to it so we need to generate keys.
+to them so we need to generate keys.
 
 ```bash
 ssh-keygen -t rsa -q -P '' -f ${HOME}/.ssh/id_rsa
@@ -64,10 +65,17 @@ sudo reboot
 
 # Creating Virtual Machines <a name="create-vms"></a>
 
-In this section, we will create the virtual machines we will provision
-and bootstrap for the rest of the workshop.
-The workshop will use KVM so it is necessary to ensure CPU virtualization
-extensions are available and nested virtualization is enabled.
+The workshop will use virtual machines for provisioning and bootstrapping.
+The operating system the VMs will be provisioned with is Ubuntu 16.04 and
+it is important these machines have sufficient performance to achieve this.
+
+Nested virtualization will help in this case since the machine each participant
+is provided with is created on an OpenStack cloud and the machines we will
+be provisioning and bootstrapping are running within that instance. (L2 guest) [3]
+
+In order for us to be able to use nested virtualization, we must ensure
+it is supported by the CPU meaning that CPU virtualization extensions are
+available and nested virtualization is enabled. [4]
 
 ```bash
 grep -i -E "vmx|svm" /proc/cpuinfo
@@ -76,133 +84,148 @@ lsmod | grep kvm
 ```
 
 As you will see in the output of the commands above, virtualization
-extensions on the machine are available but nested virtualization is
-not enabled. Please issue the commands below to enable nested virtualization.
+extensions on the machine are available and nested virtualization is
+enabled so we can continue with the next steps, first checking to see
+if libvirtd service is running and we are member of libvirtd group
+so we can interact with it.
 
 ```bash
-sudo modprobe -r kvm_intel
-sudo modprobe kvm_intel nested=1
-cat /sys/module/kvm_intel/parameters/nested
-```
-
-The command above doesn't make the setting permanent so if the machine
-gets rebooted, the nested virtualization will be disabled. In order
-to make the change permanent, please use the command below to update
-the file **/etc/modprobe.d/qemu-system-x86.conf**.
-
-```bash
-sudo bash -c 'cat << EOF > /etc/modprobe.d/qemu-system-x86.conf
-options kvm-intel nested=y
-options kvm-intel enable_apicv=n
-EOF'
-```
-
-Since the workshop will use VMs created using libvirt, we need to
-install required packages, and enable & start libvirtd service. Please
-answer N to the question you'll be asked during package installation.
-
-```bash
-TODO: ssh-keygen -t rsa?????
-TODO: chmod -R go-rwx .ssh
-TODO: sudo cp -R $HOME/.ssh /root/.ssh
-TODO: libguestfs-tools???????
-
-sudo systemctl start libvirtd
-sudo systemctl enable libvirtd
 sudo systemctl status libvirtd
-sudo usermod -aG libvirtd ubuntu
+id -a | grep libvirtd
 ```
 
-Please logout and log back in in order for group change to take effect.
-
-We can now check the available VMs, networks, and storage pools.
+We need to enable ip forwarding for the libvirt bridge to operate properly
+with dnsmasq.
 
 ```bash
-virsh list --all
+sudo sysctl -p
+sudo bash -c "sed -i '/^#net.ipv4.ip_forward/s/^#//g' /etc/sysctl.conf"
+sudo systemctl daemon-reload
+sudo sysctl -p
+```
+
+Ubuntu packaging+apparmor issue prevents libvirt from loading the ROM
+from /usr/share/misc so we need to ensure sgabios.bin is available in
+where it can be loaded.
+
+```bash
+ls -al /usr/share/qemu/sgabios.bin # if the file doesn't exist, sudo cp /usr/share/misc/sgabios.bin /usr/share/qemu/sgabios.bin
+```
+
+The default network created by libvirt during its installation conflicts
+with what we will be doing so we need to remove that network and create
+one for us to use for PXE booting.
+
+```bash
 virsh net-list --all
+ip a s
+virsh net-destroy default
+virsh net-undefine default
+virsh net-define $HOME/infra-workshop/bifrost/files/pxe-network.xml
+virsh net-autostart pxe
+virsh net-start pxe
+virsh net-list --all
+ip a s # you should see br-pxe and not virbr0
+```
+
+We now need to create a new pool in order for us to create volumes
+to use for our VMs. and volumes themselves.
+
+```bash
+virsh pool-define $HOME/infra-workshop/bifrost/files/images-pool.xml
+virsh pool-autostart images
+virsh pool-start images
 virsh pool-list --all
 ```
 
-
-We will create the VMs in 2 different ways; using virt-install and
-virsh.
-
-Before creating the VMs, we need to create disks for them.
+And volumes themselves.
 
 ```bash
-mkdir /home/ubuntu/images
-qemu-img create -f qcow2 /home/ubuntu/images/controller00.qcow2 10G
-qemu-img create -f qcow2 /home/ubuntu/images/compute00.qcow2 10G
+virsh vol-create-as images controller00.qcow2 10G --format qcow2 --prealloc-metadata
+virsh vol-create-as images compute00.qcow2 10G --format qcow2 --prealloc-metadata
+sudo chattr +C /var/lib/libvirt/images/controller00.qcow2 # set copy-on-write for volume on non-CentOS systems
+sudo chattr +C /var/lib/libvirt/images/compute00.qcow2 # set copy-on-write for volume on non-CentOS systems
+virsh vol-list --pool images
 ```
 
-Let's start with virt-install. Below command creates VM controller00
-with the details specified in the command. As you will see there, the
-boot device is set as PXE.
+VM console logs could be useful when we need to troubleshoot stuff so
+we create a folder to store the logs.
 
 ```bash
-virt-install --name controller00 \
-  --virt-type kvm \
-  --vcpus 1 \
-  --cpu host-model \
-  --memory 1024 \
-  --os-type linux \
-  --disk /home/ubuntu/images/controller00.qcow2,format=qcow2,size=10,bus=virtio \
-  --network network=default,model=virtio \
-  --boot network,hd,menu=off,useserial=yes \
-  --events on_poweroff=destroy,on_reboot=restart,on_crash=restart \
-  --graphics none \
-  --hvm \
-  --noautoconsole
+mkdir /tmp/logs
 ```
 
-After creating the VM controller00, we need to edit the domain and ensure the VM
-reboots until it finds a boot device. Please issue the command below
+We have everything ready for us to create our VMs.
 
-```bash
-virsh destory controller00
-virsh edit controller00
+VMs can be created in different ways, using virt-install or virsh
+from an existing XML file. For the sake of time, we will use precreated
+XML files to create VMs. Please take a look at them to see how
+they look. The 2 important parts in VM configuration are the boot
+order
+
+```xml
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-2.5'>hvm</type>
+    <boot dev='network'/>
+    <bootmenu enable='no'/>
+    <bios useserial='yes' rebootTimeout='10000'/>
+  </os>
 ```
 
-and update the line
+and the network the interface is attached to.
 
-```bash
-<bios useserial='yes' />
+```xml
+    <interface type='network'>
+      <source network='pxe' bridge='br-pxe'/>
+      <model type='virtio'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+    </interface>
 ```
 
-as
+Now, issue below commands to define the VMs. Please do not start
+them manually as it will be done by bifrost itself via power control
+with the help of Virtual BMC.
 
 ```bash
-<bios useserial='yes' rebootTimeout='10000' />
-```
-
-save and start the domain.
-
-```bash
-virsh start controller00
-```
-
-Second VM, compute00, will be created using virsh.
-
-```bash
-virsh define $HOME/infra-workshop/bifrost/xml/compute00.xml
-virsh start compute00
-```
-
-Let us look at the VMs we created.
-
-```bash
+virsh define $HOME/infra-workshop/bifrost/files/controller00.xml
+virsh define $HOME/infra-workshop/bifrost/files/compute00.xml
 virsh list --all
 ```
 
-We can also see that the VMs attempt to do PXE-boot, fails and
-they get restarted due to the setting **rebootTimeout** we set.
+In order for the workshop to be realistic, the machine power control
+will be done over IPMI instead of virsh even though we are working
+with VMs using Virtual BMC (vbmc). [5] [6]
+
+vbmc is a utility created by OpenStack community to control VMs
+using IPMI commands, simulating Baseboard Management Controller (BMC).
 
 ```bash
-sudo tcpdump -i virbr0
+sudo pip install virtualbmc==1.3
+sudo vbmc add controller00 --libvirt-uri qemu:///system --port 625
+sudo vbmc add compute00 --libvirt-uri qemu:///system --port 626
+sudo vbmc start controller00
+sudo vbmc start compute00
+sudo vbmc list
 ```
 
-We not have our VMs ready to be provisioned and bootstrapped so
-we can proceed with Bifrost installation and configuration.
+And finally, we need to create inventory for bifrost so it knows
+which machines it is operating on.
+
+```bash
+cp $HOME/infra-workshop/bifrost/files/baremetal.json /tmp
+```
+
+**Do not forget to add vbmc ports and MAC addresses of your VMs
+into this file. Or bifrost will fail provisioning machines!**
+
+You can find out vbmc ports and mac addresses of your VMs using
+the commands below.
+
+```bash
+sudo vbmc list
+virsh dumpxml controller00 | grep 'mac address'
+virsh dumpxml compute00 | grep 'mac address'
+```
 
 # Bifrost Installation <a name="bifrost-installation"></a>
 
@@ -257,3 +280,8 @@ ansible-playbook -i inventory/bifrost_inventory.py deploy-dynamic.yaml
 # References <a name="references"></a>
 
 1. https://docs.openstack.org/bifrost/latest/
+2. https://opnfv-releng-xci.readthedocs.io/en/latest/
+3. https://www.linux-kvm.org/page/Nested_Guests
+4. https://en.wikipedia.org/wiki/X86_virtualization
+5. https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface
+6. https://docs.openstack.org/virtualbmc/latest/
