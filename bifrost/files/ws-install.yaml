@@ -1,0 +1,47 @@
+---
+- hosts: target
+  name: "Install Ironic on the target host."
+  become: yes
+  gather_facts: yes
+  roles:
+    - { role: bifrost-prep-for-install, when: skip_install is not defined }
+    - role: bifrost-keystone-install
+    - role: bifrost-ironic-install
+      cleaning: false
+      testing: false
+      enabled_hardware_types: ipmi
+      network_interface: "br-pxe"
+    - role: bifrost-keystone-client-config
+      user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+      clouds:
+        bifrost:
+          config_username: "{{ ironic.keystone.default_username }}"
+          config_password: "{{ ironic.keystone.default_password }}"
+          config_project_name: "baremetal"
+          config_region_name: "{{ keystone.bootstrap.region_name }}"
+          config_auth_url: "{{ keystone.bootstrap.public_url }}"
+        bifrost-admin:
+          config_username: "{{ keystone.bootstrap.username }}"
+          config_password: "{{ keystone.bootstrap.password }}"
+          config_project_name: "{{ keystone.bootstrap.project_name }}"
+          config_region_name: "{{ keystone.bootstrap.region_name }}"
+          config_auth_url: "{{ keystone.bootstrap.public_url }}"
+    - { role: bifrost-create-dib-image, dib_imagename: "{{ http_boot_folder }}/ipa", build_ramdisk: false, dib_os_element: "{{ ipa_dib_os_element|default('debian') }}", dib_elements: "ironic-agent {{ ipa_extra_dib_elements | default('') }}", when: create_ipa_image | bool == true }
+    - role: bifrost-create-dib-image
+      dib_imagetype: "qcow2"
+      dib_imagename: "{{deploy_image}}"
+      dib_env_vars:
+        DIB_PYTHON_VERSION: 2
+      dib_os_element: "{{ lookup('env','DIB_OS_ELEMENT') }}"
+      dib_os_release: "{{ lookup('env', 'DIB_OS_RELEASE') }}"
+      extra_dib_elements: "{{ lookup('env', 'EXTRA_DIB_ELEMENTS') | default('') }}"
+      dib_elements: "vm enable-serial-console simple-init devuser openssh-server growroot pip-and-virtualenv {{ extra_dib_elements }}"
+      dib_packages: "{{ lookup('env', 'DIB_OS_PACKAGES') }}"
+      dib_notmpfs: true
+      when:
+        - create_image_via_dib | bool == true
+        - transform_boot_image | bool == false
+  environment:
+    http_proxy: "{{ lookup('env','http_proxy') }}"
+    https_proxy: "{{ lookup('env','https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"

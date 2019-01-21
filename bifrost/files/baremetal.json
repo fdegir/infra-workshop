@@ -1,0 +1,60 @@
+{
+    "compute00": {
+        "ansible_ssh_host": "192.168.122.4",
+        "driver": "ipmi",
+        "driver_info": {
+            "power": {
+                "ipmi_address": "192.168.122.1",
+                "ipmi_password": "password",
+                "ipmi_port": "add_ipmi_port_of_your_controller00_node_from_vbmc",
+                "ipmi_username": "admin"
+            }
+        },
+        "host_groups": [
+            "baremetal"
+        ],
+        "ipv4_address": "192.168.122.4",
+        "name": "compute00",
+        "nics": [
+            {
+                "mac": "add_mac_of_your_compute00_node"
+            }
+        ],
+        "properties": {
+            "cpu_arch": "x86_64",
+            "cpus": "1",
+            "disk_size": "10",
+            "ram": "2048"
+        },
+        "uuid": "00000000-0000-0000-0000-000000000002"
+    },
+    "controller00": {
+        "ansible_ssh_host": "192.168.122.3",
+        "driver": "ipmi",
+        "driver_info": {
+            "power": {
+                "ipmi_address": "192.168.122.1",
+                "ipmi_password": "password",
+                "ipmi_port": "add_ipmi_port_of_your_controller00_node_from_vbmc",
+                "ipmi_username": "admin"
+            }
+        },
+        "host_groups": [
+            "baremetal"
+        ],
+        "ipv4_address": "192.168.122.3",
+        "name": "controller00",
+        "nics": [
+            {
+                "mac": "add_mac_of_your_controller00_node"
+            }
+        ],
+        "properties": {
+            "cpu_arch": "x86_64",
+            "cpus": "1",
+            "disk_size": "10",
+            "ram": "2048"
+        },
+        "uuid": "00000000-0000-0000-0000-000000000001"
+    }
+}

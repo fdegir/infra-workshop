@@ -2,8 +2,10 @@
 
 1. [Introduction](#introduction)
 2. [Prepare Host Machine](#prepare-host)  
-3. [Creating Virtual Machineis](#create-vms)  
+3. [Creating Virtual Machines](#create-vms)  
 4. [Bifrost Installation](#bifrost-installation)  
+5. [Provisioning Machines](#provisioning-machines)  
+6. [Bootstrapping Machines](#bootstrapping-machines)  
 
 
 # Introduction <a name="introduction"></a>
@@ -233,47 +235,139 @@ Bifrost installation is pretty straightforward since everything
 is automated. Apart from being automated, it allows users to
 configure it in a way that suits their needs best.
 
-First, we need to clone bifrost repository and checkout a known
-working version.
+First, we need to clone bifrost repository,  checkout a known
+working version, install its requirements, and finally install
+Ansible.
 
-Next step is to install Ansible and its dependencies since Bifrost is Ansible
-based. Once the installation is done, we can reboot our machine.
-
-```bash
-sudo pip install -U pip==9.0.3
-sudo pip install ansible==2.5.8 virtualbmc
-```
 
 ```bash
-cd $HOME
-git clone https://git.openstack.org/openstack/bifrost
+git clone https://git.openstack.org/openstack/bifrost $HOME/bifrost
 cd bifrost && git checkout 0f605cd723
+sudo pip install --upgrade -r requirements.txt
+sudo pip install ansible==2.5.8
 ```
 
-As noted above, we need to set few environment variables to
-configure how bifrost should work. Some of these environment
-variables are necessary for Disk Image Builder bifrost uses
-for building images.
+Bifrost configuration can either directly be done within corresponding
+vars files, from command line or using environment variables. We will
+set few environment variables to achieve this.
+
+Bifrost uses Diskimage-builder (DIB) for building customized operating
+system images so first few variables are used for telling Bifrost and
+indirectly DIB about what kind of image we want to build. [7]
 
 ```bash
 export DIB_OS_RELEASE="xenial"
 export DIB_OS_ELEMENT="ubuntu-minimal"
 export DIB_OS_PACKAGES="vim,less,bridge-utils,language-pack-en,iputils-ping,rsyslog,curl,iptables"
+```
+
+Next environment variables are used for Bifrost itself.
+
+```bash
 export BIFROST_INVENTORY_SOURCE=/tmp/baremetal.json
 export BIFROST_INVENTORY_DHCP=false
 export BIFROST_DOWNLOAD_IPA=true
 export BIFROST_CREATE_IPA=false
 ```
 
-sudo mkdir /httpboot /tftpboot
-sudo mkdir /etc/dnsmasq.d/bifrost.dhcp-hosts.d
-sudo chmod -R 0755 /etc/dnsmasq.d/bifrost.dhcp-hosts.d
-cd $HOME/bifrost
-sudo pip install --upgrade -r requirements.txt
-ansible-playbook -i inventory/target ws-install.yaml
+Please note that if you logout from your machine or close the console
+you will need to set these environment variables again before interacting
+with bifrost again.
 
-ansible-playbook -i inventory/bifrost_inventory.py enroll-dynamic.yaml
-ansible-playbook -i inventory/bifrost_inventory.py deploy-dynamic.yaml
+Bifrost operates dnsmasq itself so existing dnsmasq processes cause issues
+for it. Before we proceed with Bifrost installation, we need to kill all
+dnsmasq processes.
+
+```bash
+sudo killall -w dnsmasq
+pgrep -i dnsmasq
+```
+
+Bifrost installation can be done with existing playbooks but one can create
+their own playbooks to do customized installations using Bifrost roles. This
+is what we will be doing so please diff original role with ours to see how
+we configure our installation.
+
+```bash
+cp $HOME/infra-workshop/bifrost/files/ws-install.yaml $HOME/bifrost/playbooks/
+diff $HOME/bifrost/playbooks/install.yaml cp $HOME/infra-workshop/bifrost/playbooks/ws-install.yaml
+cd $HOME/bifrost/playbooks
+ansible-playbook -i inventory/target ws-install.yaml
+```
+
+The installation and build of the operating system image will take about 20
+minutes so this is a good opportunity to take a coffee break. We will continue
+with provisioning the machines when we are back.
+
+# Provisioning Machines <a name="provisioning-machines"></a>
+
+At this point, you can open 2 additional console windows to monitor the
+provisioning.
+
+On first console window, login to your machine and issue below command
+to see your nodes being enrolled, managed by Bifrost via IPMIs (powered
+up, etc).
+
+```bash
+source $HOME/bifrost/env-vars
+for i in {1..500}; do
+clear
+ironic node-list
+echo
+virsh list --all
+sleep 2
+done
+```
+
+On second console window, login to your machine and issue below command
+to see the traffic going through the bridge, br-pxe, which will show
+all the DHCP, and boot requests coming from VMs and so on.
+
+```bash
+sudo tcpdump -i br-pxe
+```
+
+The first thing we need to do is to enroll our nodes in Ironic using Bifrost.
+Once the nodes are enrolled, it will be in **available** state for further
+operation with Ironic.
+
+```bash
+cd $HOME/bifrost/playbooks
+ansible-playbook -vvv -i inventory/bifrost_inventory.py enroll-dynamic.yaml -e network_interface=br-pxe
+```
+
+You should see your nodes to appear in the output of ironic command on
+the first console.
+
+We can start deployment now.
+
+```bash
+cd $HOME/bifrost/playbooks
+ansible-playbook -vvv -i inventory/bifrost_inventory.py deploy-dynamic.yaml -e network_interface=br-pxe
+```
+
+On first console, you should see the different states nodes go through, change
+in their power states and so on. You can see the different states on ironic
+documentation. [8]
+
+Once the nodes are powered on, you should start seeing traffic
+on your console where you are running tcpdump. Please look at
+the output and get yourself familiar with it since it will be useful
+when we do this for our lab.
+
+Wait until you see your nodes in active state in ironic command output which
+will take about 5 minutes.
+
+Once you see your nodes as **active** on ironic output, you can ssh to them.
+
+```bash
+ssh root@<ip_of_controller00>
+ssh root@<ip_of_compute00>
+```
+
+# Bootstrapping Machines <a name="bootstrapping-machines"></a>
+
+TBD
 
 # Next Steps <a name="next-steps"></a>
 
@@ -285,3 +379,5 @@ ansible-playbook -i inventory/bifrost_inventory.py deploy-dynamic.yaml
 4. https://en.wikipedia.org/wiki/X86_virtualization
 5. https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface
 6. https://docs.openstack.org/virtualbmc/latest/
+7. https://docs.openstack.org/diskimage-builder/latest/
+8. https://docs.openstack.org/ironic/latest/contributor/states.html
