@@ -1,0 +1,18 @@
+---
+- name: Install chrony
+  package:
+    name: "chrony"
+    state: present
+- name: Restart chrony
+  service:
+    name: "{{ (ansible_pkg_mgr == 'apt') | ternary('chrony', 'chronyd') }}"
+    state: restarted
+- name: Synchronize time
+  shell: "chronyc -a 'burst 4/4' && chronyc -a makestep"
+  args:
+    executable: /bin/bash
+  changed_when: True
+  register: chrony_got_time
+  until: chrony_got_time.rc == 0
+  retries: 5
+  delay: 5

@@ -1,0 +1,7 @@
+---
+- hosts: baremetal
+  gather_facts: yes
+  remote_user: root
+
+  roles:
+    - role: bootstrap-host

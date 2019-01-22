@@ -1,0 +1,23 @@
+---
+- include: network.yml
+
+- include: time.yml
+
+- include: package-install.yml
+
+- name: Reboot hosts
+  shell: "reboot"
+  async: 1
+  poll: 0
+
+- name: Wait for hosts to come back to life
+  local_action:
+    module: wait_for
+    host: "{{ ansible_ssh_host }}"
+    port: 22
+    delay: 10
+    timeout: 180
+
+- name: Ensure host is back online
+  debug:
+    msg: "Host {{ inventory_hostname }} is online"

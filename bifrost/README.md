@@ -383,9 +383,10 @@ provisioned.
 
 * adding routes so nodes can access to the internet
 * applying network configuration
-* updating the system
 * configuring time sync
+* updating the system
 * installing packages
+* rebooting the nodes and waiting for them to come back online
 
 But before starting with the above tasks, we can test access to the
 nodes via Ansible.
@@ -414,6 +415,16 @@ so the tasks we are about to execute must be performed on those and
 not somewhere else. We can specify them by using **baremetal** group
 which our target nodes controller00 and compute00 are members of.
 You can check this by looking into baremetal.json file.
+
+If the last ansible command worked fine, you are now ready to
+bootstrap nodes by issuing the command below.
+
+```bash
+ansible-playbook -i $HOME/bifrost/playbooks/inventory/bifrost_inventory.py $HOME/infra-workshop/bifrost/playbooks/configure-targethosts.yml
+```
+
+This command will take few minutes to complete and you will see what
+Ansible is doing on the nodes on your console.
 
 # Next Steps <a name="next-steps"></a>
 

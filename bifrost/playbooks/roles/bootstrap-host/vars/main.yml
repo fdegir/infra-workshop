@@ -1,0 +1,13 @@
+---
+default_gateway: "192.168.122.1"
+dns_nameservers: "91.123.193.111 91.123.193.222"
+host_info:
+  controller00:
+      pxe_ip: "192.168.122.3"
+      mgmt_ip: "10.10.0.3"
+      ext_ip: "10.20.0.3"
+  compute00:
+      pxe_ip: "192.168.122.4"
+      mgmt_ip: "10.10.0.4"
+      ext_ip: "10.20.0.4"
+#host_info: {'jumphost':{'MGMT_IP': '172.29.236.10','VLAN_IP': '192.168.122.2', 'STORAGE_IP': '172.29.244.10'},'controller00':{'MGMT_IP': '172.29.236.11','VLAN_IP': '192.168.122.3', 'STORAGE_IP': '172.29.244.11'},'controller01':{'MGMT_IP': '172.29.236.12','VLAN_IP': '192.168.122.4', 'STORAGE_IP': '172.29.244.12'},'controller02':{'MGMT_IP': '172.29.236.13','VLAN_IP': '192.168.122.5', 'STORAGE_IP': '172.29.240.13'},'compute00':{'MGMT_IP': '172.29.236.14','VLAN_IP': '192.168.122.6','VLAN_IP_SECOND': '173.29.241.1','VXLAN_IP': '172.29.240.14', 'STORAGE_IP': '172.29.244.14'},'compute01':{'MGMT_IP': '172.29.236.15','VLAN_IP': '192.168.122.7','VLAN_IP_SECOND': '173.29.241.2','VXLAN_IP': '172.29.240.15', 'STORAGE_IP': '172.29.244.15'}}

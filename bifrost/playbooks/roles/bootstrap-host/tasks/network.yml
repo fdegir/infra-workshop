@@ -1,0 +1,37 @@
+---
+- name: Ensure glean rules are removed
+  file:
+    path: "/etc/udev/rules.d/99-glean.rules"
+    state: absent
+
+- name: Delete default gateway
+  shell: "ip route del default"
+  become: yes
+
+- name: Ensure the default gateway is correct
+  shell: "ip route add default via {{ default_gateway }}"
+
+- name: Determine required packages
+  set_fact:
+    network_packages:
+      - "{{ (ansible_pkg_mgr in ['zypper', 'apt']) | ternary('iproute2', 'iproute') }}"
+
+- name: Ensure networking packages are present
+  package:
+    name: "{{ network_packages }}"
+    state: present
+
+- name: Ensure interfaces.d folder is empty
+  file:
+    path: "/etc/network/interfaces.d/"
+    state: absent
+
+- name: Configure networking on target hosts
+  template:
+    src: "debian.interfaces.j2"
+    dest: "/etc/network/interfaces"
+
+- name: Restart networking
+  service:
+    name: "networking"
+    state: restarted
