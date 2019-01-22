@@ -25,6 +25,11 @@ otherwise is noted.
 Please note that certain parts in configuration files or the playbooks
 are left empty and they are expected to be filled by the participants.
 
+Before you start following the workshop steps, please ensure that you
+configure your SSH client to keep the connection alive since some of the
+commands take some time to execute and it would be good not to lose the
+connection. [3]
+
 # Prepare Jumphost <a name="prepare-host"></a>
 
 This section contains the installation and configuration steps that must be
@@ -74,11 +79,11 @@ it is important these machines have sufficient performance to achieve this.
 
 Nested virtualization will help in this case since the machine each participant
 is provided with is created on an OpenStack cloud and the machines we will
-be provisioning and bootstrapping are running within that instance. (L2 guest) [3]
+be provisioning and bootstrapping are running within that instance. (L2 guest) [4]
 
 In order for us to be able to use nested virtualization, we must ensure
 it is supported by the CPU meaning that CPU virtualization extensions are
-available and nested virtualization is enabled. [4]
+available and nested virtualization is enabled. [5]
 
 ```bash
 grep -i -E "vmx|svm" /proc/cpuinfo
@@ -139,6 +144,11 @@ done
 virsh net-list --all
 ip a s # you should see br_pxe, br_mgmt, br_ext and not virbr0
 ```
+
+The interfaces named br_pxe-nic, br_mgmt-nic, and br_ext-nic are interfaces
+created with ip to ensure that the bridge has at least one interface beneath
+it to get it's mac address from. It passes no real traffic, since it's not
+really connected to any physical device.
 
 We now need to create a new pool in order for us to create volumes
 to use for our VMs. and volumes themselves.
@@ -208,7 +218,7 @@ virsh dominfo compute00
 
 In order for the workshop to be realistic, the machine power control
 will be done over IPMI instead of virsh even though we are working
-with VMs using Virtual BMC (vbmc). [5] [6]
+with VMs using Virtual BMC (vbmc). [6] [7]
 
 vbmc is a utility created by OpenStack community to control VMs
 using IPMI commands, simulating Baseboard Management Controller (BMC).
@@ -265,7 +275,7 @@ set few environment variables to achieve this.
 
 Bifrost uses Diskimage-builder (DIB) for building customized operating
 system images so first few variables are used for telling Bifrost and
-indirectly DIB about what kind of image we want to build. [7]
+indirectly DIB about what kind of image we want to build. [8]
 
 ```bash
 export DIB_OS_RELEASE="xenial"
@@ -302,7 +312,7 @@ we configure our installation.
 
 ```bash
 cp $HOME/infra-workshop/bifrost/files/ws-install.yaml $HOME/bifrost/playbooks/
-diff $HOME/bifrost/playbooks/install.yaml cp $HOME/infra-workshop/bifrost/playbooks/ws-install.yaml
+diff $HOME/bifrost/playbooks/install.yaml $HOME/infra-workshop/bifrost/playbooks/ws-install.yaml
 cd $HOME/bifrost/playbooks
 ansible-playbook -i inventory/target ws-install.yaml
 ```
@@ -360,7 +370,7 @@ ansible-playbook -vvv -i inventory/bifrost_inventory.py deploy-dynamic.yaml -e n
 
 On first console, you should see the different states nodes go through, change
 in their power states and so on. You can see the different states on ironic
-documentation. [8]
+documentation. [9]
 
 Once the nodes are powered on, you should start seeing traffic
 on your console where you are running tcpdump. Please look at
@@ -408,7 +418,7 @@ key is baked into the operating system image for root user.
 to provision the nodes. This inventory already contains the required
 information regarding the nodes so we do not need to create a separate
 inventory and just continue using it with dynamic inventory mechanism
-made available by Bifrost. [9] Please make sure that the environment
+made available by Bifrost. [10] Please make sure that the environment
 variable **BIFROST_INVENTORY_SOURCE** is always set, pointing to the
 right bifrost inventory file before you issue ansible commands.
 * **host groups**: We will be operating on the nodes we provisioned
@@ -436,7 +446,7 @@ As you will notice, a specific role is used for bootstrapping nodes.
 Roles provide a framework for fully independent, or interdependent
 collections of variables, tasks, files, templates, and modules. Roles
 also can enable the reuse so one role can be used within different
-playbooks. [10]
+playbooks. [11]
 
 # Cleanup
 
@@ -467,11 +477,12 @@ virsh list --all
 
 1. https://docs.openstack.org/bifrost/latest/
 2. https://opnfv-releng-xci.readthedocs.io/en/latest/
-3. https://www.linux-kvm.org/page/Nested_Guests
-4. https://en.wikipedia.org/wiki/X86_virtualization
-5. https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface
-6. https://docs.openstack.org/virtualbmc/latest/
-7. https://docs.openstack.org/diskimage-builder/latest/
-8. https://docs.openstack.org/ironic/latest/contributor/states.html
-9. https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html
-10. https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html
+3. https://patrickmn.com/aside/how-to-keep-alive-ssh-sessions/
+4. https://www.linux-kvm.org/page/Nested_Guests
+5. https://en.wikipedia.org/wiki/X86_virtualization
+6. https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface
+7. https://docs.openstack.org/virtualbmc/latest/
+8. https://docs.openstack.org/diskimage-builder/latest/
+9. https://docs.openstack.org/ironic/latest/contributor/states.html
+10. https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html
+11. https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html
