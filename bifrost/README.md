@@ -6,6 +6,7 @@
 4. [Bifrost Installation](#bifrost-installation)  
 5. [Provisioning Machines](#provisioning-machines)  
 6. [Bootstrapping Machines](#bootstrapping-machines)  
+7. [Cleanup](#cleanup)  
 
 
 # Introduction <a name="introduction"></a>
@@ -426,9 +427,41 @@ ansible-playbook -i $HOME/bifrost/playbooks/inventory/bifrost_inventory.py $HOME
 This command will take few minutes to complete and you will see what
 Ansible is doing on the nodes on your console.
 
-# Next Steps <a name="next-steps"></a>
+The hostnames Ansible operates on are displayed after each task since
+we instructed Ansible to operate on hosts within baremetal group and
+the hosts in this group are controller00 and compute00, bootstrapped
+by Ansible.
 
-TBD
+As you will notice, a specific role is used for bootstrapping nodes.
+Roles provide a framework for fully independent, or interdependent
+collections of variables, tasks, files, templates, and modules. Roles
+also can enable the reuse so one role can be used within different
+playbooks. [10]
+
+# Cleanup
+
+We are nearly done with the workshop but before we end it, we could
+perhaps cleanup the environment by
+
+```bash
+source $HOME/bifrost/env-vars
+ironic node-list
+ironic node-set-provision-state 00000000-0000-0000-0000-000000000001 deleted
+ironic node-set-provision-state 00000000-0000-0000-0000-000000000002 deleted
+ironic node-delete 00000000-0000-0000-0000-000000000001 # issue this command when the node becomes available
+ironic node-delete 00000000-0000-0000-0000-000000000002 # issue this command when the node becomes available
+ironic node-list
+sudo vbmc list
+sudo vbmc delete controller00
+sudo vbmc delete compute00
+sudo vbmc list
+virsh list --all
+virsh destroy controller00
+virsh destroy compute00
+virsh undefine controller00
+virsh undefine compute00
+virsh list --all
+```
 
 # References <a name="references"></a>
 
@@ -441,3 +474,4 @@ TBD
 7. https://docs.openstack.org/diskimage-builder/latest/
 8. https://docs.openstack.org/ironic/latest/contributor/states.html
 9. https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html
+10. https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html
