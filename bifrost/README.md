@@ -378,9 +378,46 @@ ssh root@<ip_of_compute00>
 
 # Bootstrapping Machines <a name="bootstrapping-machines"></a>
 
-TBD
+In this section, we will do basic configuration on the nodes we just
+provisioned.
+
+* adding routes so nodes can access to the internet
+* applying network configuration
+* updating the system
+* configuring time sync
+* installing packages
+
+But before starting with the above tasks, we can test access to the
+nodes via Ansible.
+
+```bash
+export BIFROST_INVENTORY_SOURCE=/tmp/baremetal.json
+cat $BIFROST_INVENTORY_SOURCE
+ansible -u root -i $HOME/bifrost/playbooks/inventory/bifrost_inventory.py baremetal -a "uname -an"
+```
+
+There are 3 things to note above which we need to keep in mind while
+going through the rest of the workshop.
+
+* **user**: As you might have noticed above, we are instructing Ansible
+to operate under **root** user. This is needed since our SSH public
+key is baked into the operating system image for root user.
+* **inventory**: We already have the inventory created for Bifrost
+to provision the nodes. This inventory already contains the required
+information regarding the nodes so we do not need to create a separate
+inventory and just continue using it with dynamic inventory mechanism
+made available by Bifrost. [9] Please make sure that the environment
+variable **BIFROST_INVENTORY_SOURCE** is always set, pointing to the
+right bifrost inventory file before you issue ansible commands.
+* **host groups**: We will be operating on the nodes we provisioned
+so the tasks we are about to execute must be performed on those and
+not somewhere else. We can specify them by using **baremetal** group
+which our target nodes controller00 and compute00 are members of.
+You can check this by looking into baremetal.json file.
 
 # Next Steps <a name="next-steps"></a>
+
+TBD
 
 # References <a name="references"></a>
 
@@ -392,3 +429,4 @@ TBD
 6. https://docs.openstack.org/virtualbmc/latest/
 7. https://docs.openstack.org/diskimage-builder/latest/
 8. https://docs.openstack.org/ironic/latest/contributor/states.html
+9. https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html
