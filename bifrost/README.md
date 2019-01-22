@@ -450,8 +450,8 @@ playbooks. [11]
 
 # Cleanup
 
-We are nearly done with the workshop but before we end it, we could
-perhaps cleanup the environment by
+We are nearly done with the workshop but before we finish it, we could
+perhaps cleanup the environment by issuing below commands.
 
 ```bash
 source $HOME/bifrost/env-vars
