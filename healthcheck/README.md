@@ -1,4 +1,4 @@
-# Jumphost Preparation for OpenStack Healthcheck
+# OpenStack Healthcheck
 
 Before issuing before commands, please make sure admin-openrc.sh file
 is copied to jumphost.
