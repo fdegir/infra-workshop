@@ -230,6 +230,8 @@ sudo vbmc add compute00 --libvirt-uri qemu:///system --port 626
 sudo vbmc start controller00
 sudo vbmc start compute00
 sudo vbmc list
+ipmitool -I lanplus -H 192.168.122.1 -p 625 -U admin -P password chassis status
+ipmitool -I lanplus -H 192.168.122.1 -p 626 -U admin -P password chassis status
 ```
 
 And finally, we need to create inventory for bifrost so it knows
