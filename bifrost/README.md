@@ -312,7 +312,7 @@ we configure our installation.
 
 ```bash
 cp $HOME/infra-workshop/bifrost/files/ws-install.yaml $HOME/bifrost/playbooks/
-diff $HOME/bifrost/playbooks/install.yaml $HOME/infra-workshop/bifrost/playbooks/ws-install.yaml
+diff $HOME/bifrost/playbooks/install.yaml $HOME/bifrost/playbooks/ws-install.yaml
 cd $HOME/bifrost/playbooks
 ansible-playbook -i inventory/target ws-install.yaml
 ```
