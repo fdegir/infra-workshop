@@ -1,6 +1,6 @@
 # OpenStack Healthcheck
 
-Before issuing before commands, please make sure OpenStack admin-openrc.sh
+Before issuing below commands, please make sure OpenStack admin-openrc.sh
 is copied to jumphost.
 
 Apart from making admin-openrc.sh file available, the env file created
@@ -45,9 +45,45 @@ sudo docker run --env-file env \
   -v $(pwd)/functest-results:/home/opnfv/functest/results \
   opnfv/functest-healthcheck:latest
 ```
+
+Once the test finishes, you should be presented with a report showing what
+happened with the test cases.
+
+```bash
++----------------------------+------------------+---------------------+------------------+----------------+
+|         TEST CASE          |     PROJECT      |         TIER        |     DURATION     |     RESULT     |
++----------------------------+------------------+---------------------+------------------+----------------+
+|      connection_check      |     functest     |     healthcheck     |      00:01       |      PASS      |
+|       tenantnetwork1       |     functest     |     healthcheck     |      00:03       |      PASS      |
+|       tenantnetwork2       |     functest     |     healthcheck     |      00:04       |      PASS      |
+|          vmready1          |     functest     |     healthcheck     |      00:04       |      PASS      |
+|          vmready2          |     functest     |     healthcheck     |      00:05       |      PASS      |
+|         singlevm1          |     functest     |     healthcheck     |      00:35       |      PASS      |
+|         singlevm2          |     functest     |     healthcheck     |      00:41       |      PASS      |
+|         vping_ssh          |     functest     |     healthcheck     |      00:39       |      PASS      |
+|       vping_userdata       |     functest     |     healthcheck     |      00:39       |      PASS      |
+|        cinder_test         |     functest     |     healthcheck     |      00:32       |      PASS      |
+|         api_check          |     functest     |     healthcheck     |      00:00       |      SKIP      |
+|     snaps_health_check     |     functest     |     healthcheck     |      00:00       |      SKIP      |
+|            odl             |     functest     |     healthcheck     |      00:00       |      SKIP      |
++----------------------------+------------------+---------------------+------------------+----------------+
+```
+
+Apart from running all tests cases that are part of Functest Healthcheck suite,
+it is possible to run single test cases. Here is how you can do it.
+
+```bash
+sudo docker run -it --env-file env \
+  -v $(pwd)/admin-openrc.sh:/home/opnfv/functest/conf/env_file \
+  -v $(pwd)/images:/home/opnfv/functest/images \
+  -v $(pwd)/functest-results:/home/opnfv/functest/results \
+  opnfv/functest-healthcheck:latest bash
+run_tests -t <test_case_name_you_choose_from_the_list_above>
+```
+
 # Kubernetes  Healthcheck
 
-Before issuing before commands, please make sure Kubernetes kube config
+Before issuing below commands, please make sure Kubernetes kube config
 is copied to jumphost.
 
 Apart from making kube config file available, the env file created
