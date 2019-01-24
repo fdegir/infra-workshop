@@ -52,7 +52,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y gcc libffi-dev libssl-dev lsb-release make net-tools \
   python-pip python-minimal libpython-dev python-yaml wget curl apt-utils \
   python-selinux libvirt-bin qemu-utils qemu-kvm qemu-system-x86 virt-what virtinst \
-  sgabios libvirt-dev
+  sgabios libvirt-dev ipmitool
 sudo apt purge -y python-openssl # python-openssl causes issues so purge it
 sudo hostnamectl set-hostname bifrost
 sudo bash -c "sed -i -e '/127.0.0.1/s/$/ bifrost/' /etc/hosts"
@@ -216,9 +216,9 @@ virsh dominfo controller00
 virsh dominfo compute00
 ```
 
-In order for the workshop to be realistic, the machine power control
-will be done over IPMI instead of virsh even though we are working
-with VMs using Virtual BMC (vbmc). [6] [7]
+In order for the workshop to be realistic, the machine remote control
+will be done over IPMI with the help of Virtual BMC (vbmc) instead of
+virsh even though we are working with VMs. [6][7]
 
 vbmc is a utility created by OpenStack community to control VMs
 using IPMI commands, simulating Baseboard Management Controller (BMC).
@@ -266,7 +266,7 @@ Ansible.
 
 ```bash
 git clone https://git.openstack.org/openstack/bifrost $HOME/bifrost
-cd bifrost && git checkout 0f605cd723
+cd $HOME/bifrost && git checkout 0f605cd723
 sudo pip install --upgrade -r requirements.txt
 sudo pip install ansible==2.5.8
 ```
